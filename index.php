@@ -5,47 +5,60 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700" rel="stylesheet">
 
-    <link rel="stylesheet" href="dentacare-gh-pages/css/open-iconic-bootstrap.min.css">
-    <link rel="stylesheet" href="dentacare-gh-pages/css/animate.css">
-    
-    <link rel="stylesheet" href="dentacare-gh-pages/css/owl.carousel.min.css">
-    <link rel="stylesheet" href="dentacare-gh-pages/css/owl.theme.default.min.css">
-    <link rel="stylesheet" href="dentacare-gh-pages/ss/magnific-popup.css">
+<link rel="stylesheet" href="dentacare-gh-pages/css/open-iconic-bootstrap.min.css">
+<link rel="stylesheet" href="dentacare-gh-pages/css/animate.css">
 
-    <link rel="stylesheet" href="dentacare-gh-pages/css/aos.css">
+<link rel="stylesheet" href="dentacare-gh-pages/css/owl.carousel.min.css">
+<link rel="stylesheet" href="dentacare-gh-pages/css/owl.theme.default.min.css">
+<link rel="stylesheet" href="dentacare-gh-pages/css/magnific-popup.css">
 
-    <link rel="stylesheet" href="dentacare-gh-pages/css/ionicons.min.css">
+<link rel="stylesheet" href="dentacare-gh-pages/css/aos.css">
+<link rel="stylesheet" href="dentacare-gh-pages/css/ionicons.min.css">
+<link rel="stylesheet" href="dentacare-gh-pages/css/bootstrap-datepicker.css">
+<link rel="stylesheet" href="dentacare-gh-pages/css/jquery.timepicker.css">
 
-    <link rel="stylesheet" href="dentacare-gh-pages/css/bootstrap-datepicker.css">
-    <link rel="stylesheet" href="dentacare-gh-pages/css/jquery.timepicker.css">
+<link rel="stylesheet" href="dentacare-gh-pages/css/flaticon.css">
+<link rel="stylesheet" href="dentacare-gh-pages/css/icomoon.css">
+<link rel="stylesheet" href="dentacare-gh-pages/css/style.css">
 
-    
-    <link rel="stylesheet" href="dentacare-gh-pages/css/flaticon.css">
-    <link rel="stylesheet" href="dentacare-gh-pages/css/icomoon.css">
-    <link rel="stylesheet" href="dentacare-gh-pages/css/style.css">
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   </head>
   <body>
     
-	  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
-	    <div class="container">
-	      <a class="navbar-brand" href="index.html">Denta<span>Care</span></a>
-	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
-	        <span class="oi oi-menu"></span> Menu
-	      </button>
+	 <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="index.php">Denta<span>Care</span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="oi oi-menu"></span> Menu
+        </button>
 
-	      <div class="collapse navbar-collapse" id="ftco-nav">
-	        <ul class="navbar-nav ml-auto">
-	          <li class="nav-item active"><a href="index.php" class="nav-link">Home</a></li>
-	          <li class="nav-item"><a href="dentacare-gh-pages/about.php" class="nav-link">About</a></li>
-	          <li class="nav-item"><a href="dentacare-gh-pages/services.php" class="nav-link">Services</a></li>
-	          <li class="nav-item"><a href="dentacare-gh-pages/contact.php" class="nav-link">Contact</a></li>
-	          <li class="nav-item"><a href="hms/user-login.php" class="nav-link"><span>Login/Register</span></a></li>
-	        </ul>
-	      </div>
-	    </div>
-	  </nav>
+        <div class="collapse navbar-collapse" id="ftco-nav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active"><a href="index.php" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="dentacare-gh-pages/about.php" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="dentacare-gh-pages/services.php" class="nav-link">Services</a></li>
+                <li class="nav-item"><a href="dentacare-gh-pages/contact.php" class="nav-link">Contact</a></li>
+                
+                <!-- Dropdown for Login/Register -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Login/Register
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="hms/user-login.php">Login as User</a>
+                        <a class="dropdown-item" href="hms/doctor/index.php">Login as Doctor</a>
+                        <a class="dropdown-item" href="hms/admin/index.php">Login as Admin</a>
+                        
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
     <!-- END nav -->
 
     <section class="home-slider owl-carousel">
@@ -69,7 +82,7 @@
             <div class="col-md-6 col-sm-12 ftco-animate" data-scrollax=" properties: { translateY: '70%' }">
               <h1 class="mb-4" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Modern Achieve Your Desired Perfect Smile</h1>
               <p class="mb-4">Dentacare is a trusted dental clinic committed to quality oral health care</p>
-              <p><a href="#" class="btn btn-primary px-4 py-3">Login/Register</a></p>
+              <p><a href="dental/user-login.php" class="btn btn-primary px-4 py-3">Login/Register</a></p>
             </div>
           </div>
         </div>
