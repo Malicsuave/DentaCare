@@ -1,6 +1,10 @@
 <?php
 session_start();
 include('include/config.php');
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: error.php"); // Redirect to an error page or home page
+    exit();
+}
 
 // Set headers for Excel file
 header("Content-Type: application/vnd.ms-excel");

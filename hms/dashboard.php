@@ -4,6 +4,10 @@ session_start();
 include('include/config.php');
 include('include/checklogin.php');
 check_login();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'user') {
+    header("Location: error.php"); // Redirect to an error page or home page
+    exit();
+}
 
 ?>
 <!DOCTYPE html>

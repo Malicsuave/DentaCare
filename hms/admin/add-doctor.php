@@ -5,11 +5,15 @@ include('include/config.php');
 include('include/checklogin.php');
 check_login();
 
+require '../PHPMailer/vendor/autoload.php';
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: error.php"); // Redirect to an error page or home page
+    exit();
+}
 // Include PHPMailer classes
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require '../PHPMailer/vendor/autoload.php';
 
 if(isset($_POST['submit']))
 {   
@@ -81,11 +85,12 @@ if(isset($_POST['submit']))
 		<link rel="stylesheet" href="assets/css/styles.css">
 		<link rel="stylesheet" href="assets/css/plugins.css">
 		<link rel="stylesheet" href="assets/css/themes/theme-1.css" id="skin_color" />
-		<title>Admin | Add Doctor</title>
-    <!-- Include SweetAlert CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Include SweetAlert JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+		<title>Admin | Add Doctor</title>
+    <!-- Include SweetAlert CSS -->
+   
 <script type="text/javascript">
 function valid()
 {

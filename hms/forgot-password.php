@@ -2,26 +2,28 @@
 session_start();
 error_reporting(0);
 include("include/config.php");
-//Checking Details for reset password
-if(isset($_POST['submit'])){
-$name=$_POST['fullname'];
-$email=$_POST['email'];
-$query=mysqli_query($con,"select id from  users where fullName='$name' and email='$email'");
-$row=mysqli_num_rows($query);
-if($row>0){
 
-$_SESSION['name']=$name;
-$_SESSION['email']=$email;
-header('location:reset-password.php');
-} else {
-echo "<script>alert('Invalid details. Please try with valid details');</script>";
-echo "<script>window.location.href ='forgot-password.php'</script>";
-
-
-}
-
+// Checking Details for reset password
+if (isset($_POST['submit'])) {
+    $name = $_POST['fullname'];
+    $email = $_POST['email'];
+    $query = mysqli_query($con, "SELECT id FROM users WHERE fullName='$name' AND email='$email'");
+    $row = mysqli_num_rows($query);
+    
+    if ($row > 0) {
+        $_SESSION['name'] = $name;
+        $_SESSION['email'] = $email;
+        header('location:reset-password.php');
+        exit(); // Stop execution after redirection
+    } else {
+        // Store an error message in a session variable to trigger SweetAlert
+        $_SESSION['error'] = 'Invalid details. Please try with a valid email or name.';
+        header('Location: forgot-password.php');
+        exit();
+    }
 }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -39,12 +41,14 @@ echo "<script>window.location.href ='forgot-password.php'</script>";
 		<link rel="stylesheet" href="assets/css/styles.css">
 		<link rel="stylesheet" href="assets/css/plugins.css">
 		<link rel="stylesheet" href="assets/css/themes/theme-1.css" id="skin_color" />
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	</head>
 	<body class="login">
 		<div class="row">
 			<div class="main-login col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-4">
 				<div class="logo margin-top-30">
-				<a href="../index.html"><h2> DentaCare | Patient Password Recovery</h2></a>
+				<a href="../index.php"><h2> DentaCare | Patient Password Recovery</h2></a>
 				</div>
 
 				<div class="box-login">
@@ -106,11 +110,21 @@ echo "<script>window.location.href ='forgot-password.php'</script>";
 
 		<script src="assets/js/login.js"></script>
 		<script>
-			jQuery(document).ready(function() {
-				Main.init();
-				Login.init();
-			});
-		</script>
+    jQuery(document).ready(function() {
+        Main.init();
+        Login.init();
+
+        // Show SweetAlert if there's an error message
+        <?php if (isset($_SESSION['error'])): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Info',
+                text: '<?php echo $_SESSION['error']; ?>'
+            });
+            <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
+    });
+</script>
 	
 	</body>
 	<!-- end: BODY -->

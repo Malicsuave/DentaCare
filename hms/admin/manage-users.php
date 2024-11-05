@@ -5,10 +5,18 @@ include('include/config.php');
 include('include/checklogin.php');
 check_login();
 
-if(isset($_GET['del'])) {
+// Ensure only admins can access
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: error.php"); // Redirect to an error page or home page
+    exit();
+}
+
+if (isset($_GET['del'])) {
     // Execute delete query based on user ID
-    mysqli_query($con,"DELETE FROM users WHERE id = '".$_GET['id']."'");
-   
+    mysqli_query($con, "DELETE FROM users WHERE id = '" . $_GET['id'] . "'");
+
+    // Set session message for successful deletion
+    $_SESSION['msg'] = "User deleted successfully!";
     header("Location: manage-users.php"); // Redirect after deletion
     exit();
 }
@@ -119,23 +127,7 @@ while($row=mysqli_fetch_array($sql))
 														<button type="button" class="btn btn-primary btn-o btn-sm dropdown-toggle" dropdown-toggle>
 															<i class="fa fa-cog"></i>&nbsp;<span class="caret"></span>
 														</button>
-														<ul class="dropdown-menu pull-right dropdown-light" role="menu">
-															<li>
-																<a href="#">
-																	Edit
-																</a>
-															</li>
-															<li>
-																<a href="#">
-																	Share
-																</a>
-															</li>
-															<li>
-																<a href="#">
-																	Remove
-																</a>
-															</li>
-														</ul>
+														
 													</div>
 												</div></td>
 											</tr>
@@ -195,35 +187,34 @@ $cnt=$cnt+1;
 				FormElements.init();
 			});
 		</script>
-		<script>
-function confirmDeletion(userId) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = `manage-users.php?id=${userId}&del=delete`;
+	 <script>
+        function confirmDeletion(userId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `manage-users.php?id=${userId}&del=delete`;
+                }
+            });
         }
-    });
-}
-</script>
-<script>
-            // Check if there's a session message for deletion
-            <?php if (isset($_SESSION['msg']) && !empty($_SESSION['msg'])): ?>
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Deleted!',
-                    text: '<?php echo $_SESSION['msg']; ?>', // Display the session message
-                    confirmButtonText: 'OK'
-                });
-                <?php unset($_SESSION['msg']); // Clear the message after displaying ?>
-            <?php endif; ?>
-        </script>
+
+        // Check if there's a session message for deletion
+        <?php if (isset($_SESSION['msg']) && !empty($_SESSION['msg'])): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Deleted!',
+                text: '<?php echo $_SESSION['msg']; ?>', // Display the session message
+                confirmButtonText: 'OK'
+            });
+            <?php unset($_SESSION['msg']); // Clear the message after displaying ?>
+        <?php endif; ?>
+    </script>
 		<!-- end: JavaScript Event Handlers for this page -->
 		<!-- end: CLIP-TWO JAVASCRIPTS -->
 	</body>

@@ -1,5 +1,9 @@
 <?php 
 require_once("include/config.php");
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: error.php"); // Redirect to an error page or home page
+    exit();
+}
 if(!empty($_POST["emailid"])) {
 	$email= $_POST["emailid"];
 	

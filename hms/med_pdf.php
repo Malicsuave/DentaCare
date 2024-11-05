@@ -1,7 +1,10 @@
 <?php
 include ('include/config.php');
 require_once('vendor/tcpdf/tcpdf.php'); // Make sure the path is correct based on your structure
-
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'user') {
+  header("Location: error.php"); // Redirect to an error page or home page
+  exit();
+}
 function generatePDF($patientDetails, $medicalHistory) {
     // Create new PDF document
     $pdf = new TCPDF();

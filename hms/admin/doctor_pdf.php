@@ -1,6 +1,10 @@
 <?php
 session_start();
-require_once('../TCPDF-main/tcpdf.php'); // Adjusted path
+require_once('../TCPDF-main/tcpdf.php'); 
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: error.php"); // Redirect to an error page or home page
+    exit();
+}
 
 // Create new PDF document
 $pdf = new TCPDF();

@@ -1,22 +1,23 @@
 <?php
 session_start();
-//error_reporting(0);
 include("include/config.php");
+
+$alertType = "";  // Define an alert type variable to control the SweetAlert popup
+
 // Code for updating Password
-if(isset($_POST['change']))
-{
-$cno=$_SESSION['cnumber'];
-$email=$_SESSION['email'];
-$newpassword=md5($_POST['password']);
-$query=mysqli_query($con,"update doctors set password='$newpassword' where contactno='$cno' and docEmail='$email'");
-if ($query) {
-echo "<script>alert('Password successfully updated.');</script>";
-echo "<script>window.location.href ='index.php'</script>";
+if (isset($_POST['change'])) {
+    $cno = $_SESSION['cnumber'];
+    $email = $_SESSION['email'];
+    $newpassword = md5($_POST['password']);
+    $query = mysqli_query($con, "update doctors set password='$newpassword' where contactno='$cno' and docEmail='$email'");
+
+    if ($query) {
+        $alertType = "success";  // Set alert type as success
+    } else {
+        $alertType = "error";  // Set alert type as error
+    }
 }
-
-}
-
-
+?>
 ?>
 
 
@@ -35,7 +36,8 @@ echo "<script>window.location.href ='index.php'</script>";
 		<link rel="stylesheet" href="assets/css/styles.css">
 		<link rel="stylesheet" href="assets/css/plugins.css">
 		<link rel="stylesheet" href="assets/css/themes/theme-1.css" id="skin_color" />
-
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 				<script type="text/javascript">
 function valid()
 {
@@ -53,14 +55,14 @@ return true;
 		<div class="row">
 			<div class="main-login col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-4">
 				<div class="logo margin-top-30">
-				<a href="../index.html"><h2> HMS | Patient Reset Password</h2></a>
+				<a href="../../index.php"><h2> DentaCare | Patient Reset Password</h2></a>
 				</div>
 
 				<div class="box-login">
 					<form class="form-login" name="passwordreset" method="post" onSubmit="return valid();">
 						<fieldset>
 							<legend>
-								Patient Reset Password
+								Doctor Reset Password
 							</legend>
 							<p>
 								Please set your new password.<br />
@@ -97,7 +99,7 @@ return true;
 					</form>
 
 					<div class="copyright">
-						&copy; <span class="current-year"></span><span class="text-bold text-uppercase"> HMS</span>. <span>All rights reserved</span>
+						&copy; <span class="current-year"></span><span class="text-bold text-uppercase"> DentaCare</span>. <span>All rights reserved</span>
 					</div>
 			
 				</div>
@@ -121,6 +123,37 @@ return true;
 				Login.init();
 			});
 		</script>
+
+<script>
+        function valid() {
+            if (document.passwordreset.password.value != document.passwordreset.password_again.value) {
+                Swal.fire('Error', 'Password and Confirm Password fields do not match!', 'error');
+                document.passwordreset.password_again.focus();
+                return false;
+            }
+            return true;
+        }
+
+        // Trigger SweetAlert based on the PHP alertType variable
+        <?php if ($alertType == "success") { ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Password updated successfully!',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'index.php';
+                }
+            });
+        <?php } elseif ($alertType == "error") { ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Password update failed. Please try again.',
+                confirmButtonText: 'OK'
+            });
+        <?php } ?>
+    </script>
+
 	
 	</body>
 	<!-- end: BODY -->

@@ -4,6 +4,10 @@ error_reporting(0);
 include('include/config.php');
 include('include/checklogin.php');
 check_login();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: error.php"); // Redirect to an error page or home page
+    exit();
+}
 if(isset($_POST['submit']))
   {
     
@@ -13,9 +17,11 @@ if(isset($_POST['submit']))
     $weight=$_POST['weight'];
     $temp=$_POST['temp'];
    $pres=$_POST['pres'];
+   $chronic=$_POST['chronic'];
+   $prev=$_POST['previous'];
    
  
-      $query.=mysqli_query($con, "insert   tblmedicalhistory(PatientID,BloodPressure,BloodSugar,Weight,Temperature,MedicalPres)value('$vid','$bp','$bs','$weight','$temp','$pres')");
+   $query.=mysqli_query($con, "insert   tblmedicalhistory(PatientID,BloodPressure,BloodSugar,Weight,Temperature,MedicalPres,ChroniCond,PrevDen)value('$vid','$bp','$bs','$weight','$temp','$pres','$chronic','$prev')");
     if ($query) {
     echo '<script>alert("Medicle history has been added.")</script>';
     echo "<script>window.location.href ='manage-patient.php'</script>";
@@ -133,6 +139,8 @@ $ret=mysqli_query($con,"select * from tblmedicalhistory  where PatientID='$vid'"
 <th>Blood Sugar</th>
 <th>Body Temprature</th>
 <th>Medical Prescription</th>
+<th>Chronic Conditions</th>
+<th>Previous Dental Treatments</th>
 <th>Visit Date</th>
 </tr>
 <?php  
@@ -145,6 +153,8 @@ while ($row=mysqli_fetch_array($ret)) {
  <td><?php  echo $row['BloodSugar'];?></td> 
   <td><?php  echo $row['Temperature'];?></td>
   <td><?php  echo $row['MedicalPres'];?></td>
+  <td><?php  echo $row['ChronicCond'];?></td>
+  <td><?php  echo $row['PrevDen'];?></td>
   <td><?php  echo $row['CreationDate'];?></td> 
 </tr>
 <?php $cnt=$cnt+1;} ?>

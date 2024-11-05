@@ -2,38 +2,41 @@
 session_start();
 error_reporting(0);
 include("include/config.php");
-if(isset($_POST['submit']))
-{
-    $ret=mysqli_query($con,"SELECT * FROM users WHERE email='".$_POST['username']."' and password='".md5($_POST['password'])."'");
-    $num=mysqli_fetch_array($ret);
-    if($num>0)
-    {
-        $extra="dashboard.php";//
-        $_SESSION['login']=$_POST['username'];
-        $_SESSION['id']=$num['id'];
-        $host=$_SERVER['HTTP_HOST'];
-        $uip=$_SERVER['REMOTE_ADDR'];
-        $status=1;
-        // For storing log if user login successful
-        $log=mysqli_query($con,"insert into userlog(uid,username,userip,status) values('".$_SESSION['id']."','".$_SESSION['login']."','$uip','$status')");
-        $uri=rtrim(dirname($_SERVER['PHP_SELF']),'/\\');
-        header("location:http://$host$uri/$extra");
+
+if(isset($_POST['submit'])) {
+    // Fetch user data
+    $ret = mysqli_query($con, "SELECT * FROM users WHERE email='".$_POST['username']."' and password='".md5($_POST['password'])."'");
+    $num = mysqli_fetch_array($ret);
+    if($num > 0) {
+        $_SESSION['login'] = $_POST['username'];
+        $_SESSION['id'] = $num['id'];
+        $_SESSION['role'] = 'user'; // Set user role
+        $extra = "dashboard.php"; // Redirect to user dashboard
+        $host = $_SERVER['HTTP_HOST'];
+        $uip = $_SERVER['REMOTE_ADDR'];
+        $status = 1;
+
+        // Log successful login
+        $log = mysqli_query($con, "INSERT INTO userlog(uid, username, userip, status) VALUES('".$_SESSION['id']."', '".$_SESSION['login']."', '$uip', '$status')");
+        $uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+        header("Location: http://$host$uri/$extra");
+        exit();
+    } else {
+        // Log unsuccessful login
+        $_SESSION['login'] = $_POST['username'];	
+        $uip = $_SERVER['REMOTE_ADDR'];
+        $status = 0;
+        mysqli_query($con, "INSERT INTO userlog(username, userip, status) VALUES('".$_SESSION['login']."', '$uip', '$status')");
+        $_SESSION['errmsg'] = "Invalid username or password";
+        $extra = "user-login.php";
+        $host = $_SERVER['HTTP_HOST'];
+        $uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+        header("Location: http://$host$uri/$extra");
         exit();
     }
-    else
-    {
-        // For storing log if user login unsuccessful
-        $_SESSION['login']=$_POST['username'];	
-        $uip=$_SERVER['REMOTE_ADDR'];
-        $status=0;
-        mysqli_query($con,"insert into userlog(username,userip,status) values('".$_SESSION['login']."','$uip','$status')");
-        $_SESSION['errmsg']="Invalid username or password";
-        $extra="user-login.php";
-        $host  = $_SERVER['HTTP_HOST'];
-        $uri  = rtrim(dirname($_SERVER['PHP_SELF']),'/\\');
-        header("location:http://$host$uri/$extra");
-        exit();
-    }
+
+ 
+
 }
 ?>
 
@@ -87,11 +90,16 @@ if(isset($_POST['submit']))
                             </div>
                             <a href="forgot-password.php">Forgot Password ?</a>
                         </div>
+                        
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary pull-right" name="submit">
-                                Login <i class="fa fa-arrow-circle-right"></i>
-                            </button>
-                        </div>
+    <button type="submit" class="btn btn-primary pull-right" name="submit">
+        Login <i class="fa fa-arrow-circle-right"></i>
+    </button>
+    <a href="../index.php" class="btn btn-secondary pull-left">
+        Back <i class="fa fa-arrow-circle-left"></i>
+    </a>
+</div>
+                        
                         <div class="new-account">
                             Don't have an account yet?
                             <a href="registration.php">

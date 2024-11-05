@@ -11,7 +11,8 @@ if (isset($_POST['submit'])) { // Check if form is submitted
     if ($num > 0) { // If credentials match
         $extra = "dashboard.php"; // Redirect to doctor's dashboard
         $_SESSION['dlogin'] = $_POST['username'];
-        $_SESSION['id'] = $num['id']; // Store doctor ID in session
+        $_SESSION['id'] = $num['id'];
+		$_SESSION['role'] = 'doctor'; // Store doctor ID in session
         $uip = $_SERVER['REMOTE_ADDR']; // Get user IP address
         $status = 1;
 
@@ -48,7 +49,6 @@ if (isset($_POST['submit'])) { // Check if form is submitted
 <html lang="en">
 	<head>
 		<title>Doctor Login</title>
-		
 		<link href="http://fonts.googleapis.com/css?family=Lato:300,400,400italic,600,700|Raleway:300,400,500,600,700|Crete+Round:400italic" rel="stylesheet" type="text/css" />
 		<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
 		<link rel="stylesheet" href="vendor/fontawesome/css/font-awesome.min.css">
@@ -64,7 +64,7 @@ if (isset($_POST['submit'])) { // Check if form is submitted
 		<div class="row">
 			<div class="main-login col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-4">
 				<div class="logo margin-top-30">
-				<a href="../../index.php">	<h2> DentaCare | Doctor Login</h2></a>
+					<a href="../../index.php"><h2> DentaCare | Doctor Login</h2></a>
 				</div>
 
 				<div class="box-login">
@@ -80,38 +80,38 @@ if (isset($_POST['submit'])) { // Check if form is submitted
 							<div class="form-group">
 								<span class="input-icon">
 									<input type="text" class="form-control" name="username" placeholder="Username">
-									<i class="fa fa-user"></i> </span>
+									<i class="fa fa-user"></i>
+								</span>
 							</div>
 							<div class="form-group form-actions">
 								<span class="input-icon">
-									<input type="password" class="form-control password" name="password" placeholder="Password">
+									<input type="password" class="form-control password" name="password" id="password" placeholder="Password">
 									<i class="fa fa-lock"></i>
-									 </span>
-									 <a href="forgot-password.php">
-									Forgot Password ?
+								</span>
+								<div class="form-group">
+								<input type="checkbox" onclick="togglePassword()"> Show Password
+							</div>
+								<a href="forgot-password.php">Forgot Password ?</a>
+							</div>
+							
+							<div class="form-actions">
+								<button type="submit" class="btn btn-primary pull-right" name="submit">
+									Login <i class="fa fa-arrow-circle-right"></i>
+								</button>
+								<a href="../../index.php" class="btn btn-secondary pull-left">
+									Back <i class="fa fa-arrow-circle-left"></i>
 								</a>
 							</div>
-							<div class="form-actions">
-    <button type="submit" class="btn btn-primary pull-right" name="submit">
-        Login <i class="fa fa-arrow-circle-right"></i>
-    </button>
-    <a href="../../index.php" class="btn btn-secondary pull-left">
-        Back <i class="fa fa-arrow-circle-left"></i>
-    </a>
-</div>
-							
-						
 						</fieldset>
 					</form>
 
 					<div class="copyright">
 						&copy; <span class="current-year"></span><span class="text-bold text-uppercase"> DentaCare</span>. <span>All rights reserved</span>
 					</div>
-			
 				</div>
-
 			</div>
 		</div>
+
 		<script src="vendor/jquery/jquery.min.js"></script>
 		<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
 		<script src="vendor/modernizr/modernizr.js"></script>
@@ -119,17 +119,24 @@ if (isset($_POST['submit'])) { // Check if form is submitted
 		<script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 		<script src="vendor/switchery/switchery.min.js"></script>
 		<script src="vendor/jquery-validation/jquery.validate.min.js"></script>
-	
 		<script src="assets/js/main.js"></script>
-
 		<script src="assets/js/login.js"></script>
+
 		<script>
 			jQuery(document).ready(function() {
 				Main.init();
 				Login.init();
 			});
+
+			// Toggle password visibility
+			function togglePassword() {
+				var passwordField = document.getElementById("password");
+				if (passwordField.type === "password") {
+					passwordField.type = "text";
+				} else {
+					passwordField.type = "password";
+				}
+			}
 		</script>
-	
 	</body>
-	<!-- end: BODY -->
 </html>

@@ -1,10 +1,15 @@
 <?php
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+// Start session
 include('include/config.php');
 include('include/checklogin.php');
 check_login();
+
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'doctor') {
+    header("Location: error.php");
+    exit();
+}
 
 if (isset($_POST['submit'])) {
     $vid = $_GET['viewid'];
@@ -16,21 +21,26 @@ if (isset($_POST['submit'])) {
     $chronic = $_POST['chronic'];
     $prev = $_POST['previous'];
 
-    // Use prepared statements to prevent SQL injection
+    // Prepare and execute SQL
     $stmt = $con->prepare("INSERT INTO tblmedicalhistory (PatientID, BloodPressure, BloodSugar, Weight, Temperature, MedicalPres, ChronicCond, PrevDen) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("isssssss", $vid, $bp, $bs, $weight, $temp, $pres, $chronic, $prev);
 
     if ($stmt->execute()) {
-        echo '<script>alert("Medical history has been added.")</script>';
-        echo "<script>window.location.href ='manage-patient.php'</script>";
+        $successMessage = "Medical history has been added.";
     } else {
-        echo '<script>alert("Something Went Wrong. Please try again")</script>';
+        $errorMessage = "Something went wrong: " . $stmt->error; // Show SQL error
     }
 
     $stmt->close();
 }
-?>
 
+// Check patient ID
+$vid = $_GET['viewid'];
+$ret = mysqli_query($con, "SELECT * FROM tblpatient WHERE ID='$vid'");
+if (!$ret) {
+    die("Query failed: " . mysqli_error($con)); // Show SQL error
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,6 +59,8 @@ if (isset($_POST['submit'])) {
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/plugins.css">
     <link rel="stylesheet" href="assets/css/themes/theme-1.css" id="skin_color" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div id="app">
@@ -88,7 +100,7 @@ if (isset($_POST['submit'])) {
                                     </tr>
                                     <tr>
                                         <th scope>Patient Name</th>
-                                        <td><?php echo $row['PatientName ']; ?></td>
+                                        <td><?php echo $row['PatientName']; ?></td>
                                         <th scope>Patient Email</th>
                                         <td><?php echo $row['PatientEmail']; ?></td>
                                     </tr>
@@ -105,7 +117,7 @@ if (isset($_POST['submit'])) {
                                         <td><?php echo $row['PatientAge']; ?></td>
                                     </tr>
                                     <tr>
-                                        <th>Patient Medical History(if any)</th>
+                                        <th>Patient Medical History (if any)</th>
                                         <td><?php echo $row['PatientMedhis']; ?></td>
                                         <th>Patient Reg Date</th>
                                         <td><?php echo $row['CreationDate']; ?></td>
@@ -180,54 +192,60 @@ if (isset($_POST['submit'])) {
                                                         </tr>
                                                         <tr>
                                                             <th>Prescription :</th>
-                                                            <td><textarea name="pres" placeholder="Medical Prescription" rows="6" cols="6" class="form-control wd-450" required="true"></textarea></td>
+                                                            <td><textarea name="pres" placeholder="Medical Prescription" rows="6" class="form-control wd-450" required="true"></textarea></td>
                                                         </tr>
                                                         <tr>
                                                             <th>Chronic Conditions :</th>
-                                                            <td><textarea name="chronic" placeholder="Chronic Conditions" class="form-control wd-450" rows="6" cols="6"></textarea></td>
+                                                            <td><textarea name="chronic" placeholder="Chronic Conditions" rows="6" class="form-control wd-450" required="true"></textarea></td>
                                                         </tr>
                                                         <tr>
                                                             <th>Previous Dental Treatments :</th>
-                                                            <td><textarea name="previous" placeholder="Previous Dental Treatments" class="form-control wd-450" rows="6" cols="6"></textarea></td>
+                                                            <td><textarea name="previous" placeholder="Previous Dental Treatments" rows="6" class="form-control wd-450" required="true"></textarea></td>
                                                         </tr>
                                                     </table>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" name="submit" class="btn btn-primary">Add</button>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </form>
                                             </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="submit" name="submit" class="btn btn-primary">Submit</button>
-                                            </div>
-                                        </form>
+                                        </div>
                                     </div>
                                 </div>
+                                <?php if (isset($successMessage)): ?>
+                                    <script>
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Success',
+                                            text: "<?php echo $successMessage; ?>",
+                                        });
+                                    </script>
+                                <?php elseif (isset($errorMessage)): ?>
+                                    <script>
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: "<?php echo $errorMessage; ?>",
+                                        });
+                                    </script>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <?php include('include/footer.php'); ?>
-        <?php include('include/setting.php'); ?>
     </div>
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="vendor/modernizr/modernizr.js"></script>
-    <script src="vendor/jquery-cookie/jquery.cookie.js"></script>
+    <script src="vendor/jquery-easypiechart/jquery.easypiechart.min.js"></script>
     <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <script src="vendor/switchery/switchery.min.js"></script>
-    <script src="vendor/maskedinput/jquery.maskedinput.min.js"></script>
-    <script src="vendor/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js"></script>
-    <script src="vendor/autosize/autosize.min.js"></script>
-    <script src="vendor/selectFx/classie.js"></script>
-    <script src="vendor/selectFx/selectFx.js"></script>
     <script src="vendor/select2/select2.min.js"></script>
     <script src="vendor/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
     <script src="vendor/bootstrap-timepicker/bootstrap-timepicker.min.js"></script>
+    <script src="vendor/modernizr/modernizr.custom.js"></script>
     <script src="assets/js/main.js"></script>
-    <script>
-        jQuery(document).ready(function() {
-            Main.init();
-            FormElements.init();
-        });
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2@11"></script>
 </body>
 </html>

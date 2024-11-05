@@ -27,37 +27,29 @@
 						
 						
 							<li class="dropdown current-user">
-								<a href class="dropdown-toggle" data-toggle="dropdown">
-									<img src="assets/images/images.jpg"> <span class="username">
+    <a href class="dropdown-toggle" data-toggle="dropdown">
+        <?php
+        // Get the user's profile picture
+        $query = mysqli_query($con, "SELECT fullName, profile_picture FROM users WHERE id='" . $_SESSION['id'] . "'");
+        $row = mysqli_fetch_array($query);
+        $profilePicture = !empty($row['profile_picture']) ? $row['profile_picture'] : 'assets/images/default.jpg'; // Fallback image
+        ?>
+        <img src="<?php echo $profilePicture; ?>" style="width:40px; height:40px;"> <span class="username">
+            <?php echo $row['fullName']; ?> <i class="ti-angle-down"></i></span>
+    </a>
+    <ul class="dropdown-menu dropdown-dark">
+        <li>
+            <a href="edit-profile.php">My Profile</a>
+        </li>
+        <li>
+            <a href="change-password.php">Change Password</a>
+        </li>
+        <li>
+            <a href="logout.php">Log Out</a>
+        </li>
+    </ul>
+</li>
 
-
-
-									<?php $query=mysqli_query($con,"select fullName from users where id='".$_SESSION['id']."'");
-while($row=mysqli_fetch_array($query))
-{
-	echo $row['fullName'];
-}
-									?> <i class="ti-angle-down"></i></i></span>
-								</a>
-								<ul class="dropdown-menu dropdown-dark">
-									<li>
-										<a href="edit-profile.php">
-											My Profile
-										</a>
-									</li>
-								
-									<li>
-										<a href="change-password.php">
-											Change Password
-										</a>
-									</li>
-									<li>
-										<a href="logout.php">
-											Log Out
-										</a>
-									</li>
-								</ul>
-							</li>
 							<!-- end: USER OPTIONS DROPDOWN -->
 						</ul>
 						<!-- start: MENU TOGGLER FOR MOBILE DEVICES -->
