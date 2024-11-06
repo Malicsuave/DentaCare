@@ -30,7 +30,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'doctor') {
 		<link rel="stylesheet" href="assets/css/themes/theme-1.css" id="skin_color" />
 	</head>
 	<body>
-		<div id="app">		
+		<div id="app">	<?php include('include/footer.php');?>	
 <?php include('include/sidebar.php');?>
 <div class="app-content">
 <?php include('include/header.php');?>
@@ -104,7 +104,7 @@ $cnt=$cnt+1;
 </div>
 </div>
 			<!-- start: FOOTER -->
-	<?php include('include/footer.php');?>
+	
 			<!-- end: FOOTER -->
 		
 			<!-- start: SETTINGS -->

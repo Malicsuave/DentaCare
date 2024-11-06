@@ -46,7 +46,7 @@ if(isset($_POST['submit']))
         
 		if($mail->send()) {
 			echo "<script>
-				setTimeout(function() {
+				document.addEventListener('DOMContentLoaded', function() {
 					Swal.fire({
 						icon: 'success',
 						title: 'Successfully Registered!',
@@ -55,18 +55,10 @@ if(isset($_POST['submit']))
 					}).then(function() {
 						window.location.href = 'user-login.php';
 					});
-				}, 100);
-			</script>";
-		} else {
-			echo "<script>
-				Swal.fire({
-					icon: 'error',
-					title: 'Oops...',
-					text: 'Registration successful, but could not send email. Please contact support.',
 				});
 			</script>";
 		}
-	exit;
+		
     }
 }
 ?>
@@ -77,6 +69,11 @@ if(isset($_POST['submit']))
 
 	<head>
 		<title>User Registration</title>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700" rel="stylesheet">
+
 		
 		<link href="http://fonts.googleapis.com/css?family=Lato:300,400,400italic,600,700|Raleway:300,400,500,600,700|Crete+Round:400italic" rel="stylesheet" type="text/css" />
 		<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
@@ -113,7 +110,7 @@ return true;
 		<div class="row">
 			<div class="main-login col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-4">
 				<div class="logo margin-top-30">
-				<a href="../index.html"><h2>DentaCare | Patient Registration</h2></a>
+				<a href="../index.php"><h2>DentaCare | Patient Registration</h2></a>
 				</div>
 				<!-- start: REGISTER BOX -->
 				<div class="box-register">

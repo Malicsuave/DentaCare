@@ -28,36 +28,65 @@
   </head>
   <body>
     
-  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
-    <div class="container">
-        <a class="navbar-brand" href="index.php">Denta<span>Care</span></a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="oi oi-menu"></span> Menu
-        </button>
+  <style>
+        /* Navbar and dropdown styles */
+        #ftco-navbar .dropdown-menu {
+            background-color: #343a40; /* Dark background for contrast */
+            border-radius: 8px;        /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow */
+            padding: 10px 0;           /* Padding */
+        }
 
-        <div class="collapse navbar-collapse" id="ftco-nav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item active"><a href="../index.php" class="nav-link">Home</a></li>
-                <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
-                <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
-                <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
-                
-                <!-- Dropdown for Login/Register -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Login/Register
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="../hms/user-login.php">Login as User</a>
-                        <a class="dropdown-item" href="../hms/doctor/index.php">Login as Doctor</a>
-                        <a class="dropdown-item" href="../hms/admin/index.php">Login as Admin</a>
-                        
-                    </div>
-                </li>
-            </ul>
+        /* Dropdown items */
+        #ftco-navbar .dropdown-item {
+            color: #f8f9fa;               /* Light color for text */
+            padding: 10px 20px;           /* Spacing around items */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+            font-weight: 500;             /* Slightly bolder font */
+        }
+
+        /* Hover effect on dropdown items */
+        #ftco-navbar .dropdown-item:hover {
+            background-color: #17a2b8;    /* Teal background on hover */
+            color: #fff;                  /* White text on hover */
+            border-radius: 4px;           /* Subtle rounding on hover */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="index.php">Denta<span>Care</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="oi oi-menu"></span> Menu
+            </button>
+
+            <div class="collapse navbar-collapse" id="ftco-nav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active"><a href="../index.php" class="nav-link">Home</a></li>
+                    <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
+                    <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
+                    <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
+                    
+                    <!-- Dropdown for Login/Register -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Login/Register
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="../hms/user-login.php">Login as User</a>
+                            <a class="dropdown-item" href="../hms/doctor/index.php">Login as Doctor</a>
+                            <a class="dropdown-item" href="../hms/admin/index.php">Login as Admin</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- END nav -->
 
     <section class="home-slider owl-carousel">
@@ -79,7 +108,7 @@
       	<div class="row justify-content-center mb-5 pb-5">
           <div class="col-md-7 text-center heading-section ftco-animate">
             <h2 class="mb-2">Our Service Keeps you Smile</h2>
-            <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
+            <p></p>
           </div>
         </div>
         <div class="row">
@@ -90,7 +119,7 @@
               </div>
               <div class="media-body p-2 mt-3">
                 <h3 class="heading">Teeth Whitening</h3>
-                <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
+                <p>Our teeth whitening service brings out your best, ensuring a radiant smile that shines like never before.</p>
               </div>
             </div>      
           </div>
@@ -101,7 +130,7 @@
               </div>
               <div class="media-body p-2 mt-3">
                 <h3 class="heading">Teeth Cleaning</h3>
-                <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
+                <p>Get a Dazzling Clean Because even your smile deserves a little sparkle and shine!</p>
               </div>
             </div>    
           </div>
@@ -112,7 +141,7 @@
               </div>
               <div class="media-body p-2 mt-3">
                 <h3 class="heading">Quality Brackets</h3>
-                <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
+                <p>The Secret to Achieving a Straight, Confident Smile That’s Sure to Turn Heads!</p>
               </div>
             </div>      
           </div>
@@ -123,7 +152,7 @@
               </div>
               <div class="media-body p-2 mt-3">
                 <h3 class="heading">Modern Anesthetic</h3>
-                <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
+                <p>Revolutionizing Comfort and Care for Your Dental Journey, One Smile at a Time!</p>
               </div>
             </div>      
           </div>
@@ -135,7 +164,7 @@
               </div>
               <div class="media-body p-2 mt-3">
                 <h3 class="heading">Dental Calculus</h3>
-                <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
+                <p>Tartar's got nothing on us! Dental calculus, that pesky hardened plaque, thinks it can settle in rent-free. But with regular cleanings, we kick it out and keep your teeth sparkling.</p>
               </div>
             </div>      
           </div>
@@ -146,7 +175,7 @@
               </div>
               <div class="media-body p-2 mt-3">
                 <h3 class="heading">Paradontosis</h3>
-                <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
+                <p>Might sound fancy, but trust us, it's just gum disease trying to be extra. We're here to help you manage it, keep those gums happy, and give it no chance to crash your smile party..</p>
               </div>
             </div>    
           </div>
@@ -157,7 +186,7 @@
               </div>
               <div class="media-body p-2 mt-3">
                 <h3 class="heading">Dental Implants</h3>
-                <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
+                <p>Lost a tooth? No problem! Dental implants are like the superheroes of tooth replacements. Strong, dependable, and ready to save the day — restoring your smile and confidence, one implant at a time.</p>
               </div>
             </div>      
           </div>
@@ -168,7 +197,7 @@
               </div>
               <div class="media-body p-2 mt-3">
                 <h3 class="heading">Tooth Braces</h3>
-                <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
+                <p>The unsung heroes of perfect smiles! Whether you're dealing with crooked teeth or bite woes, braces are here to straighten things out. A little metal, a lot of magic — get ready for the smile transformation of your dreams.</p>
               </div>
             </div>      
           </div>
@@ -182,7 +211,7 @@
     			<div class="col-md-3 aside-stretch py-5">
     				<div class=" heading-section heading-section-white ftco-animate pr-md-4">
 	            <h2 class="mb-3">Achievements</h2>
-	            <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
+	            <p>At DentalCare, we’ve been perfecting smiles with expert care and a personal touch. From routine check-ups to trusted results, our goal is simple: making every smile brighter and every visit more comfortable.</p>
 	          </div>
     			</div>
     			<div class="col-md-9 py-5 pl-md-5">
@@ -230,7 +259,7 @@
     		<div class="row justify-content-center mb-5 pb-5">
           <div class="col-md-7 text-center heading-section ftco-animate">
             <h2 class="mb-3">Our Best Pricing</h2>
-            <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
+            <p></p>
           </div>
         </div>
     		<div class="row">
@@ -238,7 +267,7 @@
         		<div class="pricing-entry pb-5 text-center">
         			<div>
 	        			<h3 class="mb-4">Basic</h3>
-	        			<p><span class="price">$24.50</span> <span class="per">/ session</span></p>
+	        			<p><span class="price">₱500 – ₱800 </span> <span class="per">/ session</span></p>
 	        		</div>
         			<ul>
         				<li>Diagnostic Services</li>
@@ -254,7 +283,7 @@
         		<div class="pricing-entry pb-5 text-center">
         			<div>
 	        			<h3 class="mb-4">Standard</h3>
-	        			<p><span class="price">$34.50</span> <span class="per">/ session</span></p>
+	        			<p><span class="price">₱1,500 – ₱2,500</span> <span class="per">/ session</span></p>
 	        		</div>
         			<ul>
         				<li>Diagnostic Services</li>
@@ -270,7 +299,7 @@
         		<div class="pricing-entry active pb-5 text-center">
         			<div>
 	        			<h3 class="mb-4">Premium</h3>
-	        			<p><span class="price">$54.50</span> <span class="per">/ session</span></p>
+	        			<p><span class="price">₱3,000 – ₱4,500</span> <span class="per">/ session</span></p>
 	        		</div>
         			<ul>
         				<li>Diagnostic Services</li>
@@ -286,7 +315,7 @@
         		<div class="pricing-entry pb-5 text-center">
         			<div>
 	        			<h3 class="mb-4">Platinum</h3>
-	        			<p><span class="price">$89.50</span> <span class="per">/ session</span></p>
+	        			<p><span class="price">₱5,000 – ₱8,000</span> <span class="per">/ session</span></p>
 	        		</div>
         			<ul>
         				<li>Diagnostic Services</li>
@@ -369,9 +398,9 @@
         <div class="row">
           <div class="col-md-12 text-center">
 
-            <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-  Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | DENTA <i class="icon-heart" aria-hidden="true"></i> Care
-  <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+            <p>
+            Copyright &copy;<script>document.write(new Date().getFullYear());</script> DentaCare. All rights reserved.
+  </p>
           </div>
         </div>
       </div>

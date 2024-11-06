@@ -28,36 +28,66 @@
   </head>
   <body>
     
-  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
-    <div class="container">
-        <a class="navbar-brand" href="index.php">Denta<span>Care</span></a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="oi oi-menu"></span> Menu
-        </button>
+  <style>
+        /* Navbar and dropdown styles */
+        #ftco-navbar .dropdown-menu {
+            background-color: #343a40; /* Dark background for contrast */
+            border-radius: 8px;        /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow */
+            padding: 10px 0;           /* Padding */
+        }
 
-        <div class="collapse navbar-collapse" id="ftco-nav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item active"><a href="../index.php" class="nav-link">Home</a></li>
-                <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
-                <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
-                <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
-                
-                <!-- Dropdown for Login/Register -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Login/Register
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="../hms/user-login.php">Login as User</a>
-                        <a class="dropdown-item" href="../hms/doctor/index.php">Login as Doctor</a>
-                        <a class="dropdown-item" href="../hms/admin/index.php">Login as Admin</a>
-                        
-                    </div>
-                </li>
-            </ul>
+        /* Dropdown items */
+        #ftco-navbar .dropdown-item {
+            color: #f8f9fa;               /* Light color for text */
+            padding: 10px 20px;           /* Spacing around items */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+            font-weight: 500;             /* Slightly bolder font */
+        }
+
+        /* Hover effect on dropdown items */
+        #ftco-navbar .dropdown-item:hover {
+            background-color: #17a2b8;    /* Teal background on hover */
+            color: #fff;                  /* White text on hover */
+            border-radius: 4px;           /* Subtle rounding on hover */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="index.php">Denta<span>Care</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="oi oi-menu"></span> Menu
+            </button>
+
+            <div class="collapse navbar-collapse" id="ftco-nav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active"><a href="../index.php" class="nav-link">Home</a></li>
+                    <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
+                    <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
+                    <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
+                    
+                    <!-- Dropdown for Login -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Login/Register
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="../hms/user-login.php">Login as User</a>
+                            <a class="dropdown-item" href="../hms/doctor/index.php">Login as Doctor</a>
+                            <a class="dropdown-item" href="../hms/admin/index.php">Login as Admin</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
     <!-- END nav -->
 
     <section class="home-slider owl-carousel">
@@ -97,24 +127,36 @@
 		              <div class="tab-pane fade show active" id="v-pills-whatwedo" role="tabpanel" aria-labelledby="v-pills-whatwedo-tab">
 		              	<div>
 			                <h2 class="mb-4">We Offer High Quality Services</h2>
-			              	<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-			                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nesciunt voluptate, quibusdam sunt iste dolores consequatur</p>
+			              	<p>
+In a place where healthy smiles are our priority, we provide exceptional dental care services designed to make you feel comfortable and confident. Our experienced team ensures that each visit brings you closer to your dream smile.
+
+Whether it's routine check-ups, teeth whitening, or advanced dental procedures, our practice is dedicated to your well-being. We blend modern technology with a personalized approach, creating a space where oral health meets genuine care.
+
+Your comfort, your health, your smile — that's our focus.
+
+</p>
 				            </div>
 		              </div>
 
 		              <div class="tab-pane fade" id="v-pills-mission" role="tabpanel" aria-labelledby="v-pills-mission-tab">
 		                <div>
 			                <h2 class="mb-4">To Accomodate All Patients</h2>
-			              	<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-			                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nesciunt voluptate, quibusdam sunt iste dolores consequatur</p>
+			              	<p>We believe that everyone deserves access to exceptional dental care, no matter their needs or circumstances. Our practice is designed to be inclusive, providing comfortable and personalized care for every patient, young or old.
+
+From flexible appointment times to a welcoming environment, we strive to make dental care accessible to all. Whether you need a routine check-up or specialized treatment, our compassionate team is here to make your experience as smooth and stress-free as possible.
+
+Your comfort is our priority, and we work tirelessly to ensure that every patient leaves with a healthy smile.</p>
 				            </div>
 		              </div>
 
 		              <div class="tab-pane fade" id="v-pills-goal" role="tabpanel" aria-labelledby="v-pills-goal-tab">
 		                <div>
 			                <h2 class="mb-4">Help Our Customers Needs</h2>
-			              	<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-			                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nesciunt voluptate, quibusdam sunt iste dolores consequatur</p>
+			              	<p>We understand that each patient has unique needs when it comes to dental care. That's why our practice is committed to providing personalized care and tailored solutions that cater to the health and comfort of everyone we serve.
+
+Whether you're looking for preventive care, cosmetic treatments, or solutions to dental issues, we take the time to listen to your concerns and provide the best options for your oral health. Our compassionate team is here to ensure your dental experience is comfortable, effective, and designed with your well-being in mind.
+
+Your health and satisfaction are at the core of everything we do.</p>
 				            </div>
 		              </div>
 		            </div>
@@ -134,7 +176,9 @@
       			<div class="about-wrap">
       				<div class="heading-section heading-section-white mb-5 ftco-animate">
 		            <h2 class="mb-2">Dentacare with a personal touch</h2>
-		            <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
+		            <p>At our clinic, we prioritize the care and comfort of every patient, ensuring you receive a personalized treatment experience that’s tailored just for you.
+
+</p>
 		          </div>
       				<div class="list-services d-flex ftco-animate">
       					<div class="icon d-flex justify-content-center align-items-center">
@@ -142,7 +186,8 @@
       					</div>
       					<div class="text">
 	      					<h3>Well Experience Dentist</h3>
-	      					<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+	      					<p>At our clinic, we prioritize the care and comfort of every patient, ensuring you receive a personalized treatment experience that’s tailored just for you.
+</p>
       					</div>
       				</div>
       				<div class="list-services d-flex ftco-animate">
@@ -151,7 +196,8 @@
       					</div>
       					<div class="text">
 	      					<h3>High Technology Facilities</h3>
-	      					<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+	      					<p>Our skilled and compassionate dentist brings years of experience to provide the best dental care, helping you feel confident in your smile and your treatment.
+</p>
       					</div>
       				</div>
       				<div class="list-services d-flex ftco-animate">
@@ -160,7 +206,7 @@
       					</div>
       					<div class="text">
 	      					<h3>Comfortable Clinics</h3>
-	      					<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+	      					<p>Our clinic may not have the latest technology, but we pride ourselves on providing a calm, friendly environment where you can feel at ease while receiving expert care.</p>
       					</div>
       				</div>
       			</div>
@@ -188,7 +234,7 @@
                     </span>
                   </div>
                   <div class="text text-center">
-                    <p class="mb-5">Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.</p>
+                    <p class="mb-5">DentaCare truly exceeded my expectations. The staff was incredibly kind and made me feel comfortable from the moment I walked in. My smile has never looked better!</p>
                     <p class="name">Dennis Green</p>
                     <span class="position">Marketing Manager</span>
                   </div>
@@ -202,8 +248,8 @@
                     </span>
                   </div>
                   <div class="text text-center">
-                    <p class="mb-5">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                    <p class="name">Dennis Green</p>
+                    <p class="mb-5">I was nervous about visiting the dentist, but the team at DentaCare made it such a pleasant experience. They took the time to explain each step, and now I'm no longer afraid of dental visits.</p>
+                    <p class="name">Kevin Red</p>
                     <span class="position">Interface Designer</span>
                   </div>
                 </div>
@@ -216,36 +262,36 @@
                     </span>
                   </div>
                   <div class="text text-center">
-                    <p class="mb-5">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                    <p class="name">Dennis Green</p>
+                    <p class="mb-5">The level of professionalism and care at DentaCare is unmatched. They genuinely care about your well-being, and it shows in every detail. I highly recommend them for anyone seeking quality dental care.</p>
+                    <p class="name">Rey blue</p>
                     <span class="position">UI Designer</span>
                   </div>
                 </div>
               </div>
               <div class="item">
                 <div class="testimony-wrap p-4 pb-5">
-                  <div class="user-img mb-5" style="background-image: url(images/person_1.jpg)">
+                  <div class="user-img mb-5" style="background-image: url(images/person_4.jpg)">
                     <span class="quote d-flex align-items-center justify-content-center">
                       <i class="icon-quote-left"></i>
                     </span>
                   </div>
                   <div class="text text-center">
-                    <p class="mb-5">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                    <p class="name">Dennis Green</p>
+                    <p class="mb-5">Their modern approach and the friendly atmosphere always make me feel at ease. Plus, they work with my schedule, which is a big help!</p>
+                    <p class="name">Ivan White</p>
                     <span class="position">Web Developer</span>
                   </div>
                 </div>
               </div>
               <div class="item">
                 <div class="testimony-wrap p-4 pb-5">
-                  <div class="user-img mb-5" style="background-image: url(images/person_1.jpg)">
+                  <div class="user-img mb-5" style="background-image: url(images/person_5.jpg)">
                     <span class="quote d-flex align-items-center justify-content-center">
                       <i class="icon-quote-left"></i>
                     </span>
                   </div>
                   <div class="text text-center">
-                    <p class="mb-5">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                    <p class="name">Dennis Green</p>
+                    <p class="mb-5">They were so patient with my questions and really helped me understand my treatment options. I felt completely at ease the entire time.</p>
+                    <p class="name">Ocarl Orange</p>
                     <span class="position">System Analytics</span>
                   </div>
                 </div>
@@ -262,7 +308,7 @@
     			<div class="col-md-3 aside-stretch py-5">
     				<div class=" heading-section heading-section-white ftco-animate pr-md-4">
 	            <h2 class="mb-3">Achievements</h2>
-	            <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
+	            <pAt DentalCare, we’ve been perfecting smiles with expert care and a personal touch. From routine check-ups to trusted results, our goal is simple: making every smile brighter and every visit more comfortable.</p>
 	          </div>
     			</div>
     			<div class="col-md-9 py-5 pl-md-5">
@@ -372,9 +418,8 @@
         <div class="row">
           <div class="col-md-12 text-center">
 
-            <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-  Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | DENTA <i class="icon-heart" aria-hidden="true"></i> Care
-  <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+            <p>
+            Copyright &copy;<script>document.write(new Date().getFullYear());</script>  DentaCare. All rights reserved.  </p>
           </div>
         </div>
       </div>

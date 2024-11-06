@@ -50,36 +50,87 @@ echo "<script>window.location.href ='contact.php'</script>";
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
   <body>
-  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
-    <div class="container">
-        <a class="navbar-brand" href="index.php">Denta<span>Care</span></a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="oi oi-menu"></span> Menu
-        </button>
+  <style>
+        /* Navbar background and text */
+        #ftco-navbar {
+            background-color: #343a40; /* Dark background color for navbar */
+        }
 
-        <div class="collapse navbar-collapse" id="ftco-nav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item active"><a href="../index.php" class="nav-link">Home</a></li>
-                <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
-                <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
-                <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
-                
-                <!-- Dropdown for Login/Register -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Login/Register
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="../hms/user-login.php">Login as User</a>
-                        <a class="dropdown-item" href="../hms/doctor/index.php">Login as Doctor</a>
-                        <a class="dropdown-item" href="../hms/admin/index.php">Login as Admin</a>
-                        
-                    </div>
-                </li>
-            </ul>
+        /* Dropdown menu style */
+        #ftco-navbar .dropdown-menu {
+            background-color: #343a40; /* Dark background for dropdown */
+            border-radius: 8px;         /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            padding: 10px 0;            /* Padding */
+        }
+
+        /* Dropdown items style */
+        #ftco-navbar .dropdown-item {
+            color: #f8f9fa;                 /* Light color for text */
+            padding: 10px 20px;             /* Spacing around items */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth hover transition */
+            font-weight: 500;               /* Slightly bold font */
+        }
+
+        /* Hover effect for dropdown items */
+        #ftco-navbar .dropdown-item:hover {
+            background-color: #17a2b8;      /* Teal color on hover */
+            color: #fff;                    /* White text on hover */
+            border-radius: 4px;             /* Slight rounding on hover */
+        }
+
+        /* Active state for Login/Register link */
+        #ftco-navbar .nav-link.dropdown-toggle:active {
+            color: #17a2b8;                 /* Teal color on click */
+        }
+
+        /* Navbar links style */
+        #ftco-navbar .nav-link {
+            color: #f8f9fa;                 /* Light color for regular navbar links */
+            transition: color 0.3s ease;    /* Smooth color transition */
+        }
+
+        /* Hover effect for navbar links */
+        #ftco-navbar .nav-link:hover {
+            color: #17a2b8;                 /* Teal color on hover */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="index.php">Denta<span>Care</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="oi oi-menu"></span> Menu
+            </button>
+
+            <div class="collapse navbar-collapse" id="ftco-nav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active"><a href="../index.php" class="nav-link">Home</a></li>
+                    <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
+                    <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
+                    <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
+                    
+                    <!-- Dropdown for Login/Register -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Login/Register
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="../hms/user-login.php">Login as User</a>
+                            <a class="dropdown-item" href="../hms/doctor/index.php">Login as Doctor</a>
+                            <a class="dropdown-item" href="../hms/admin/index.php">Login as Admin</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
     <!-- END nav -->
 
     <section class="home-slider owl-carousel">
@@ -188,9 +239,9 @@ echo "<script>window.location.href ='contact.php'</script>";
         <div class="row">
           <div class="col-md-12 text-center">
 
-            <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-  Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | DENTA <i class="icon-heart" aria-hidden="true"></i> Care
-  <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+            <p>
+            Copyright &copy;<script>document.write(new Date().getFullYear());</script> DentaCare. All rights reserved.
+  </p>
           </div>
         </div>
       </div>

@@ -50,11 +50,11 @@ $msg="Doctor Details updated Successfully";
 
 	</head>
 	<body>
-		<div id="app">	<?php include('include/footer.php');?>	
+		<div id="app">	<?php include('include/footer.php');?>	<?php include('include/header.php');?>
 <?php include('include/sidebar.php');?>
 			<div class="app-content">
 				
-						<?php include('include/header.php');?>
+						
 						<!-- start: MENU TOGGLER FOR MOBILE DEVICES -->
 					
 				<!-- end: TOP NAVBAR -->
@@ -136,7 +136,7 @@ while($row=mysqli_fetch_array($ret))
 														</div>
 <div class="form-group">
 															<label for="fess">
-																 Doctor Consultancy Fees
+																 Doctor Fees
 															</label>
 		<input type="text" name="docfees" class="form-control" required="required"  value="<?php echo htmlentities($data['docFees']);?>" >
 														</div>
