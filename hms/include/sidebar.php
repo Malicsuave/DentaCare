@@ -32,6 +32,18 @@
 									</div>
 								</a>
 							</li>
+							<li>
+								<a href="sendsms.php">
+									<div class="item-content">
+										<div class="item-media">
+											<i class="ti-pencil-alt"></i>
+										</div>
+										<div class="item-inner">
+											<span class="title"> Send SMS </span>
+										</div>
+									</div>
+								</a>
+							</li>
 
 							<li>
 								<a href="appointment-history.php">

@@ -114,7 +114,7 @@ if (isset($_POST['submit']) || isset($_POST['pay_online'])) {
     <script src="https://checkout.stripe.com/checkout.js"></script>
 </head>
 <body>
-<div id="app">        
+<div id="app">        <?php include('include/footer.php');?>
     <?php include('include/sidebar.php');?>
     <div class="app-content">
         <?php include('include/header.php');?>
@@ -227,7 +227,7 @@ if (isset($_POST['submit']) || isset($_POST['pay_online'])) {
             description: 'Full Payment',
             amount: document.getElementById('fees').value * 100, // Convert to cents
             currency: 'php',
-            email: 'reywillardd01@gmail.com'
+            email: 'dentacare112@gmi'
         });
         e.preventDefault();
     });
