@@ -238,10 +238,17 @@ while($row=mysqli_fetch_array($ret))
 												
 												
 											</div>
+											
 										</div>
+										
 									</div>
+									
 								</div>
+								
 							</div>
+							
+							</div>
+							
 						</div>
 						<!-- end: BASIC EXAMPLE -->
 			
@@ -251,10 +258,12 @@ while($row=mysqli_fetch_array($ret))
 						
 					
 						<!-- end: SELECT BOXES -->
-						
+						<?php include('include/footer.php');?>
 					</div>
 				</div>
+				
 			</div>
+			
 			<?php if ($success): ?>
         <script>
             Swal.fire({
@@ -267,7 +276,7 @@ while($row=mysqli_fetch_array($ret))
         </script>
     <?php endif; ?>
 			<!-- start: FOOTER -->
-	<?php include('include/footer.php');?>
+			
 			<!-- end: FOOTER -->
 		
 			<!-- start: SETTINGS -->
@@ -275,7 +284,7 @@ while($row=mysqli_fetch_array($ret))
 			
 			<!-- end: SETTINGS -->
 		</div>
-		<!-- start: MAIN JAVASCRIPTS -->
+		
 		<script src="vendor/jquery/jquery.min.js"></script>
 		<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
 		<script src="vendor/modernizr/modernizr.js"></script>
@@ -297,6 +306,12 @@ while($row=mysqli_fetch_array($ret))
 		<script src="assets/js/main.js"></script>
 		<!-- start: JavaScript Event Handlers for this page -->
 		<script src="assets/js/form-elements.js"></script>
+		
+		<!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
+		<!-- start: CLIP-TWO JAVASCRIPTS -->
+		<script src="assets/js/main.js"></script>
+		<!-- start: JavaScript Event Handlers for this page -->
+		<script src="assets/js/form-elements.js"></script>
 		<script>
 			jQuery(document).ready(function() {
 				Main.init();
@@ -305,5 +320,6 @@ while($row=mysqli_fetch_array($ret))
 		</script>
 		<!-- end: JavaScript Event Handlers for this page -->
 		<!-- end: CLIP-TWO JAVASCRIPTS -->
+		
 	</body>
 </html>

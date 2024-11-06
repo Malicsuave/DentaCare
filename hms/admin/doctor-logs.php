@@ -109,16 +109,20 @@ while($row=mysqli_fetch_array($sql))
                             </div>
                         </div>
                         <!-- end: BASIC EXAMPLE -->
+                        
                     </div>
+                    
                 </div>
+                
             </div>
             <!-- start: FOOTER -->
-            <?php include('include/footer.php');?>
+            
             <!-- end: FOOTER -->
             <!-- start: SETTINGS -->
             <?php include('include/setting.php');?>
             <!-- end: SETTINGS -->
         </div>
+        <?php include('include/footer.php');?>
         <!-- start: MAIN JAVASCRIPTS -->
         <script src="vendor/jquery/jquery.min.js"></script>
         <script src="vendor/bootstrap/js/bootstrap.min.js"></script>

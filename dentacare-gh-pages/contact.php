@@ -1,7 +1,27 @@
+<?php
+include_once('../hms/include/config.php');
+
+if(isset($_POST['submit']))
+{
+$name=$_POST['fullname'];
+$email=$_POST['emailid'];
+$mobileno=$_POST['mobileno'];
+$dscrption=$_POST['description'];
+$query=mysqli_query($con,"insert into tblcontactus(fullname,email,contactno,message) value('$name','$email','$mobileno','$dscrption')");
+echo "<script>alert('Your information succesfully submitted');</script>";
+echo "<script>window.location.href ='contact.php'</script>";
+
+}
+
+
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>DentaCare - Free Bootstrap 4 Template by Colorlib</title>
+    <title>Contact-DentaCare</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     
@@ -25,27 +45,41 @@
     <link rel="stylesheet" href="css/flaticon.css">
     <link rel="stylesheet" href="css/icomoon.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Include SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
   <body>
-    
   <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
-	    <div class="container">
-	      <a class="navbar-brand" href="index.html">Denta<span>Care</span></a>
-	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
-	        <span class="oi oi-menu"></span> Menu
-	      </button>
+    <div class="container">
+        <a class="navbar-brand" href="index.php">Denta<span>Care</span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="oi oi-menu"></span> Menu
+        </button>
 
-	      <div class="collapse navbar-collapse" id="ftco-nav">
-	        <ul class="navbar-nav ml-auto">
-	          <li class="nav-item active"><a href="../index.php" class="nav-link">Home</a></li>
-	          <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
-	          <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
-	          <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
-	          <li class="nav-item"><a href="hms/user-login.php" class="nav-link"><span>Login/Register</span></a></li>
-	        </ul>
-	      </div>
-	    </div>
-	  </nav>
+        <div class="collapse navbar-collapse" id="ftco-nav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active"><a href="../index.php" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
+                <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
+                
+                <!-- Dropdown for Login/Register -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Login/Register
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="../hms/user-login.php">Login as User</a>
+                        <a class="dropdown-item" href="../hms/doctor/index.php">Login as Doctor</a>
+                        <a class="dropdown-item" href="../hms/admin/index.php">Login as Admin</a>
+                        
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
     <!-- END nav -->
 
     <section class="home-slider owl-carousel">
@@ -63,50 +97,29 @@
     </section>
 		
 		<section class="ftco-section contact-section ftco-degree-bg">
-      <div class="container">
-        <div class="row d-flex mb-5 contact-info">
-          <div class="col-md-12 mb-4">
-            <h2 class="h4">Contact Information</h2>
-          </div>
-          <div class="w-100"></div>
-          <div class="col-md-3">
-            <p><span>Address:</span> 198 West 21th Street, Suite 721 New York NY 10016</p>
-          </div>
-          <div class="col-md-3">
-            <p><span>Phone:</span> <a href="tel://1234567920">+ 1235 2355 98</a></p>
-          </div>
-          <div class="col-md-3">
-            <p><span>Email:</span> <a href="mailto:info@yoursite.com">info@yoursite.com</a></p>
-          </div>
-          <div class="col-md-3">
-            <p><span>Website</span> <a href="#">yoursite.com</a></p>
-          </div>
+        <div class="container">
+            <div class="row block-9">
+                <div class="col-md-6 pr-md-5">
+                    <form method="POST" action="contact.php">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="fullname" required placeholder="Your Name">
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" name="emailid" required placeholder="Your Email">
+                        </div>
+                        <div class="form-group">
+    <input type="text" class="form-control" name="mobileno" required="true" maxlength="11" placeholder="Mobile Number" oninput="limitInput(this)">
+</div>
+                        <div class="form-group">
+                            <textarea class="form-control" name="description" required placeholder="Message" cols="30" rows="7"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" name="submit" class="btn btn-primary py-3 px-5">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="row block-9">
-          <div class="col-md-6 pr-md-5">
-            <form action="#">
-              <div class="form-group">
-                <input type="text" class="form-control" placeholder="Your Name">
-              </div>
-              <div class="form-group">
-                <input type="text" class="form-control" placeholder="Your Email">
-              </div>
-              <div class="form-group">
-                <input type="text" class="form-control" placeholder="Subject">
-              </div>
-              <div class="form-group">
-                <textarea name="" id="" cols="30" rows="7" class="form-control" placeholder="Message"></textarea>
-              </div>
-              <div class="form-group">
-                <input type="submit" value="Send Message" class="btn btn-primary py-3 px-5">
-              </div>
-            </form>
-          
-          </div>
-
-          <div class="col-md-6" id="map"></div>
-        </div>
-      </div>
     </section>
 
     <footer class="ftco-footer ftco-bg-dark ftco-section">
@@ -256,6 +269,17 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
   <script src="js/google-map.js"></script>
   <script src="js/main.js"></script>
+
+  <script>
+function limitInput(input) {
+    // Remove any non-numeric characters
+    input.value = input.value.replace(/\D/g, '');
+    // Ensure the length does not exceed 11
+    if (input.value.length > 11) {
+        input.value = input.value.slice(0, 11);
+    }
+}
+</script>
     
   </body>
 </html>

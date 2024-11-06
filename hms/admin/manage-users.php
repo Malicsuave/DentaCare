@@ -148,10 +148,11 @@ $cnt=$cnt+1;
 						<!-- end: SELECT BOXES -->
 						
 					</div>
+					<?php include('include/footer.php');?>
 				</div>
 			</div>
 			<!-- start: FOOTER -->
-	<?php include('include/footer.php');?>
+	
 			<!-- end: FOOTER -->
 		
 			<!-- start: SETTINGS -->

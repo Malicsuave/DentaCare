@@ -85,7 +85,7 @@ if (isset($_POST['submit'])) {
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <div id="app">        
+    <div id="app">   <?php include('include/footer.php');?>     
         <?php include('include/sidebar.php');?>
         <div class="app-content">
             <?php include('include/header.php');?>

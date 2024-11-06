@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>DentaCare - Free Bootstrap 4 Template by Colorlib</title>
+    <title>DentaCare - Services</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     
@@ -29,24 +29,35 @@
   <body>
     
   <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
-	    <div class="container">
-	      <a class="navbar-brand" href="index.html">Denta<span>Care</span></a>
-	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
-	        <span class="oi oi-menu"></span> Menu
-	      </button>
+    <div class="container">
+        <a class="navbar-brand" href="index.php">Denta<span>Care</span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="oi oi-menu"></span> Menu
+        </button>
 
-	      <div class="collapse navbar-collapse" id="ftco-nav">
-	        <ul class="navbar-nav ml-auto">
-	          <li class="nav-item active"><a href="../index.php" class="nav-link">Home</a></li>
-	          <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
-	          <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
-	          >
-	          <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
-	          <li class="nav-item"><a href="hms/user-login.php" class="nav-link"><span>Login/Register</span></a></li>
-	        </ul>
-	      </div>
-	    </div>
-	  </nav>
+        <div class="collapse navbar-collapse" id="ftco-nav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active"><a href="../index.php" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
+                <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
+                
+                <!-- Dropdown for Login/Register -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Login/Register
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="../hms/user-login.php">Login as User</a>
+                        <a class="dropdown-item" href="../hms/doctor/index.php">Login as Doctor</a>
+                        <a class="dropdown-item" href="../hms/admin/index.php">Login as Admin</a>
+                        
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
     <!-- END nav -->
 
     <section class="home-slider owl-carousel">

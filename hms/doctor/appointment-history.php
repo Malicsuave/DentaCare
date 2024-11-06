@@ -127,12 +127,10 @@ if ($row['userStatus'] == 1 && $row['doctorStatus'] == 1) {
 <td>
 <?php 
 
-
-
 if ($row['userStatus'] == 1 && $row['doctorStatus'] == 1) { ?>
     <a href="appointment-history.php?id=<?php echo $row['id']?>&cancel=update" 
        onClick="return confirm('Are you sure you want to cancel this appointment?')" 
-       class="btn btn-transparent btn-xs tooltips" title="Cancel Appointment">
+       class="btn btn-danger btn-xs tooltips" title="Cancel Appointment">
        Cancel
     </a>
     <a href="appointment-history.php?id=<?php echo $row['id']?>&complete=update" 

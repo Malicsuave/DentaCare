@@ -44,6 +44,9 @@ $_SESSION['msg1']="Old Password not match !!";
 		<link rel="stylesheet" href="assets/css/styles.css">
 		<link rel="stylesheet" href="assets/css/plugins.css">
 		<link rel="stylesheet" href="assets/css/themes/theme-1.css" id="skin_color" />
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Include SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="text/javascript">
 function valid()
 {
@@ -202,6 +205,19 @@ return true;
 				Main.init();
 				FormElements.init();
 			});
+			<?php if ($message == "success"): ?>
+            Swal.fire({
+                title: 'Success!',
+                text: "<?php echo htmlentities($_SESSION['msg1']); ?>",
+                icon: 'success'
+            });
+            <?php elseif ($message == "error"): ?>
+            Swal.fire({
+                title: 'Error!',
+                text: "<?php echo htmlentities($_SESSION['msg1']); ?>",
+                icon: 'error'
+            });
+            <?php endif; ?>
 		</script>
 		<!-- end: JavaScript Event Handlers for this page -->
 		<!-- end: CLIP-TWO JAVASCRIPTS -->

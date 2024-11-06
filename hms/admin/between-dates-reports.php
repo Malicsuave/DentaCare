@@ -33,7 +33,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
 	</head>
 	<body>
-		<div id="app">		
+		<div id="app">	<?php include('include/footer.php');?>	
 <?php include('include/sidebar.php');?>
 			<div class="app-content">
 				
@@ -106,23 +106,19 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 											</div>
 										</div>
 									</div>
+									
 								</div>
+								
 							</div>
+							
 						</div>
-						<!-- end: BASIC EXAMPLE -->
-			
-					
-					
-						
-						
-					
-						<!-- end: SELECT BOXES -->
 						
 					</div>
 				</div>
+				
 			</div>
 			<!-- start: FOOTER -->
-	<?php include('include/footer.php');?>
+			
 			<!-- end: FOOTER -->
 		
 			<!-- start: SETTINGS -->
@@ -130,6 +126,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 			
 			<!-- end: SETTINGS -->
 		</div>
+		
 		<!-- start: MAIN JAVASCRIPTS -->
 		<script src="vendor/jquery/jquery.min.js"></script>
 		<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
@@ -158,6 +155,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 				FormElements.init();
 			});
 		</script>
+		
 		<!-- end: JavaScript Event Handlers for this page -->
 		<!-- end: CLIP-TWO JAVASCRIPTS -->
 	</body>

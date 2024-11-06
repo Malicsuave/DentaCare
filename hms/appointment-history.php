@@ -4,19 +4,22 @@ error_reporting(0);
 include('include/config.php');
 include('include/checklogin.php');
 check_login();
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'user') {
-    header("Location: error.php"); // Redirect to an error page or home page
+    header("Location: error.php");
     exit();
 }
 
 if (isset($_GET['cancel'])) {
     mysqli_query($con, "UPDATE appointment SET userStatus='0' WHERE id = '" . $_GET['id'] . "'");
     $_SESSION['msg'] = "Your appointment canceled !!";
+    $_SESSION['alert'] = "cancel"; // Set a session to trigger SweetAlert
 }
 
 if (isset($_GET['success'])) {
     mysqli_query($con, "UPDATE appointment SET doctorStatus='1' WHERE id = '" . $_GET['id'] . "'");
     $_SESSION['msg'] = "Appointment marked as successful!";
+    $_SESSION['alert'] = "success"; // Set a session to trigger SweetAlert
 }
 ?>
 <!DOCTYPE html>
@@ -40,6 +43,7 @@ if (isset($_GET['success'])) {
 </head>
 <body>
 <div id="app">
+
     <?php include('include/sidebar.php'); ?>
     <div class="app-content">
         <?php include('include/header.php'); ?>
@@ -125,14 +129,19 @@ if (isset($_GET['success'])) {
                                 </tbody>
                             </table>
                         </div>
+                        
                     </div>
                 </div>
             </div>
+           
         </div>
     </div>
-    <?php include('include/footer.php'); ?>
+    <?php include('include/footer.php');?>
     <?php include('include/setting.php'); ?>
 </div>
+
+
+
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
 <script src="vendor/modernizr/modernizr.js"></script>
@@ -155,5 +164,6 @@ if (isset($_GET['success'])) {
         FormElements.init();
     });
 </script>
+
 </body>
 </html>

@@ -83,7 +83,7 @@ if (isset($_POST['submit'])) {
 
 </head>
 <body>
-<div id="app">
+<div id="app"><?php include('include/footer.php');?>
     <?php include('include/sidebar.php'); ?>
     <div class="app-content">
         <?php include('include/header.php'); ?>
@@ -114,8 +114,7 @@ if (isset($_POST['submit'])) {
                                             <h5 class="panel-title">Change Password</h5>
                                         </div>
                                         <div class="panel-body">
-                                            <p style="color:red;"><?php echo htmlentities($_SESSION['msg1']); ?>
-                                                <?php echo htmlentities($_SESSION['msg1'] = ""); ?></p>
+                                           
                                             <form role="form" name="chngpwd" method="post" onSubmit="return valid();">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1">
@@ -152,7 +151,7 @@ if (isset($_POST['submit'])) {
                     </div>
                 </div>
             </div>
-            <?php include('include/footer.php'); ?>
+            
             <?php include('include/setting.php'); ?>
         </div>
         <script src="vendor/jquery/jquery.min.js"></script>

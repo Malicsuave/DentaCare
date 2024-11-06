@@ -19,10 +19,13 @@ if (isset($_POST['submit'])) {
     }
 }
 
-if (isset($_GET['del'])) {
+if (isset($_GET['del']) && isset($_GET['id'])) {
     mysqli_query($con, "DELETE FROM doctorSpecilization WHERE id = '" . $_GET['id'] . "'");
     $_SESSION['del_msg'] = "Specialization deleted successfully!";
+    header("Location: doctor-specilization.php"); // Redirect to avoid re-triggering deletion
+    exit();
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -131,9 +134,10 @@ if (isset($_GET['del'])) {
                     </div>
                 </div>
             </div>
-            <?php include('include/footer.php'); ?>
+           
             <?php include('include/setting.php'); ?>
         </div>
+        <?php include('include/footer.php'); ?>
     </div>
 		<!-- start: MAIN JAVASCRIPTS -->
 		<script src="vendor/jquery/jquery.min.js"></script>

@@ -50,7 +50,7 @@ $msg="Doctor Details updated Successfully";
 
 	</head>
 	<body>
-		<div id="app">		
+		<div id="app">	<?php include('include/footer.php');?>	
 <?php include('include/sidebar.php');?>
 			<div class="app-content">
 				
@@ -194,12 +194,12 @@ while($row=mysqli_fetch_array($ret))
 				</div>
 			</div>
 			<!-- start: FOOTER -->
-	<?php include('include/footer.php');?>
+	
 			<!-- end: FOOTER -->
 		
 			<!-- start: SETTINGS -->
 	<?php include('include/setting.php');?>
-			<>
+			
 			<!-- end: SETTINGS -->
 		</div>
 		<!-- start: MAIN JAVASCRIPTS -->
