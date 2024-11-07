@@ -1,19 +1,20 @@
 <?php
 include_once('../hms/include/config.php');
 
-if(isset($_POST['submit']))
-{
-$name=$_POST['fullname'];
-$email=$_POST['emailid'];
-$mobileno=$_POST['mobileno'];
-$dscrption=$_POST['description'];
-$query=mysqli_query($con,"insert into tblcontactus(fullname,email,contactno,message) value('$name','$email','$mobileno','$dscrption')");
-echo "<script>alert('Your information succesfully submitted');</script>";
-echo "<script>window.location.href ='contact.php'</script>";
+$successMessage = false; // Initialize a flag for success
 
+if (isset($_POST['submit'])) {
+    $name = $_POST['fullname'];
+    $email = $_POST['emailid'];
+    $mobileno = $_POST['mobileno'];
+    $dscrption = $_POST['description'];
+
+    $query = mysqli_query($con, "INSERT INTO tblcontactus(fullname,email,contactno,message) VALUE('$name','$email','$mobileno','$dscrption')");
+
+    if ($query) {
+        $successMessage = true; // Set flag to true if submission is successful
+    }
 }
-
-
 ?>
 
 
@@ -106,10 +107,10 @@ echo "<script>window.location.href ='contact.php'</script>";
 
             <div class="collapse navbar-collapse" id="ftco-nav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active"><a href="../index.php" class="nav-link">Home</a></li>
+                    <li class="nav-item"><a href="../index.php" class="nav-link">Home</a></li>
                     <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
                     <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
-                    <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
+                    <li class="nav-item active"><a href="contact.php" class="nav-link">Contact</a></li>
                     
                     <!-- Dropdown for Login/Register -->
                     <li class="nav-item dropdown">
@@ -331,6 +332,22 @@ function limitInput(input) {
     }
 }
 </script>
+<?php if ($successMessage): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Submitted!',
+                    text: 'Your information was successfully submitted!',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'contact.php';
+                    }
+                });
+            });
+        </script>
+    <?php endif; ?>
     
   </body>
 </html>

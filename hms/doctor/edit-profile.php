@@ -149,13 +149,12 @@ if (isset($_POST['submit'])) {
 			FormElements.init();
 			
 			<?php if ($updateSuccess) { ?>
-				Swal.fire({
-					icon: 'success',
-					title: 'Doctor Details Updated Successfully',
-					showConfirmButton: false,
-					timer: 1500
-				});
-			<?php } ?>
+    Swal.fire({
+        icon: 'success',
+        title: 'Doctor Details Updated Successfully',
+        confirmButtonText: 'OK'
+    });
+<?php } ?>
 		});
 	</script>
 </body>

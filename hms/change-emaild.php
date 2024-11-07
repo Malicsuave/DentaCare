@@ -12,11 +12,12 @@ if(isset($_POST['submit']))
 {
 	$email=$_POST['email'];
 $sql=mysqli_query($con,"Update users set email='$email' where id='".$_SESSION['id']."'");
-if($sql)
-{
+if($sql){
 $msg="Your email updated Successfully";
 
-
+} else {
+	// If the query failed, get the error message
+	$msg = "Error updating email: " . mysqli_error($con);
 }
 
 }

@@ -262,8 +262,8 @@
 					<div class="staff">
 						<div class="img mb-4" style="background-image: url(images/person_5.jpg);"></div>
 						<div class="info text-center">
-							<h3><a href="teacher-single.html">Tom Smith</a></h3>
-							<span class="position">Dentist</span>
+							<h3><a href="teacher-single.html">Francisco Morales</a></h3>
+							<span class="position">Cosmetic Dentist</span>
 							<div class="text">
 								<p></p>
 								<ul class="ftco-social">
@@ -280,8 +280,8 @@
 					<div class="staff">
 						<div class="img mb-4" style="background-image: url(images/person_6.jpg);"></div>
 						<div class="info text-center">
-							<h3><a href="teacher-single.html">Mark Wilson</a></h3>
-							<span class="position">Dentist</span>
+							<h3><a href="teacher-single.html">Jose Luis Reyes</a></h3>
+							<span class="position">Orthodontist</span>
 							<div class="text">
 								<p></p>
 								<ul class="ftco-social">
@@ -298,8 +298,8 @@
 					<div class="staff">
 						<div class="img mb-4" style="background-image: url(images/person_7.jpg);"></div>
 						<div class="info text-center">
-							<h3><a href="teacher-single.html">Patrick Jacobson</a></h3>
-							<span class="position">Dentist</span>
+							<h3><a href="teacher-single.html">Maria Teresa Cruz</a></h3>
+							<span class="position">General Dentist</span>
 							<div class="text">
 								<p></p>
 								<ul class="ftco-social">
@@ -316,8 +316,8 @@
 					<div class="staff">
 						<div class="img mb-4" style="background-image: url(images/person_8.jpg);"></div>
 						<div class="info text-center">
-							<h3><a href="teacher-single.html">Ivan Dorchsner</a></h3>
-							<span class="position">System Analyst</span>
+							<h3><a href="teacher-single.html">Rafael Hernandez</a></h3>
+							<span class="position">Pedodontist</span>
 							<div class="text">
 								<p></p>
 								<ul class="ftco-social">

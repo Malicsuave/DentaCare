@@ -63,8 +63,8 @@
 
             <div class="collapse navbar-collapse" id="ftco-nav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active"><a href="../index.php" class="nav-link">Home</a></li>
-                    <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
+                    <li class="nav-item"><a href="../index.php" class="nav-link">Home</a></li>
+                    <li class="nav-item active"><a href="about.php" class="nav-link">About</a></li>
                     <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
                     <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
                     
@@ -218,87 +218,12 @@ Your health and satisfaction are at the core of everything we do.</p>
     <section class="ftco-section testimony-section bg-light">
       <div class="container">
         <div class="row justify-content-center mb-5 pb-3">
-          <div class="col-md-7 text-center heading-section ftco-animate">
-            <h2 class="mb-2">Testimony</h2>
-            <span class="subheading">Our Happy Customer Says</span>
+          <div class="col-md-6 text-center heading-section ftco-animate">
+            <h2 class="mb-2">Visit Us</h2>
+            <span class="subheading">Be part of our Program</span>
           </div>
         </div>
-        <div class="row justify-content-center ftco-animate">
-          <div class="col-md-8">
-            <div class="carousel-testimony owl-carousel ftco-owl">
-              <div class="item">
-                <div class="testimony-wrap p-4 pb-5">
-                  <div class="user-img mb-5" style="background-image: url(images/person_1.jpg)">
-                    <span class="quote d-flex align-items-center justify-content-center">
-                      <i class="icon-quote-left"></i>
-                    </span>
-                  </div>
-                  <div class="text text-center">
-                    <p class="mb-5">DentaCare truly exceeded my expectations. The staff was incredibly kind and made me feel comfortable from the moment I walked in. My smile has never looked better!</p>
-                    <p class="name">Dennis Green</p>
-                    <span class="position">Marketing Manager</span>
-                  </div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="testimony-wrap p-4 pb-5">
-                  <div class="user-img mb-5" style="background-image: url(images/person_2.jpg)">
-                    <span class="quote d-flex align-items-center justify-content-center">
-                      <i class="icon-quote-left"></i>
-                    </span>
-                  </div>
-                  <div class="text text-center">
-                    <p class="mb-5">I was nervous about visiting the dentist, but the team at DentaCare made it such a pleasant experience. They took the time to explain each step, and now I'm no longer afraid of dental visits.</p>
-                    <p class="name">Kevin Red</p>
-                    <span class="position">Interface Designer</span>
-                  </div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="testimony-wrap p-4 pb-5">
-                  <div class="user-img mb-5" style="background-image: url(images/person_3.jpg)">
-                    <span class="quote d-flex align-items-center justify-content-center">
-                      <i class="icon-quote-left"></i>
-                    </span>
-                  </div>
-                  <div class="text text-center">
-                    <p class="mb-5">The level of professionalism and care at DentaCare is unmatched. They genuinely care about your well-being, and it shows in every detail. I highly recommend them for anyone seeking quality dental care.</p>
-                    <p class="name">Rey blue</p>
-                    <span class="position">UI Designer</span>
-                  </div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="testimony-wrap p-4 pb-5">
-                  <div class="user-img mb-5" style="background-image: url(images/person_4.jpg)">
-                    <span class="quote d-flex align-items-center justify-content-center">
-                      <i class="icon-quote-left"></i>
-                    </span>
-                  </div>
-                  <div class="text text-center">
-                    <p class="mb-5">Their modern approach and the friendly atmosphere always make me feel at ease. Plus, they work with my schedule, which is a big help!</p>
-                    <p class="name">Ivan White</p>
-                    <span class="position">Web Developer</span>
-                  </div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="testimony-wrap p-4 pb-5">
-                  <div class="user-img mb-5" style="background-image: url(images/person_5.jpg)">
-                    <span class="quote d-flex align-items-center justify-content-center">
-                      <i class="icon-quote-left"></i>
-                    </span>
-                  </div>
-                  <div class="text text-center">
-                    <p class="mb-5">They were so patient with my questions and really helped me understand my treatment options. I felt completely at ease the entire time.</p>
-                    <p class="name">Ocarl Orange</p>
-                    <span class="position">System Analytics</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </div>
     </section>
 

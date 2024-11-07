@@ -1,15 +1,9 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-// Start session
+session_start();
+error_reporting(0);
 include('include/config.php');
 include('include/checklogin.php');
 check_login();
-
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'doctor') {
-    header("Location: error.php");
-    exit();
-}
 
 if (isset($_POST['submit'])) {
     $vid = $_GET['viewid'];
@@ -21,30 +15,58 @@ if (isset($_POST['submit'])) {
     $chronic = $_POST['chronic'];
     $prev = $_POST['previous'];
 
-    // Prepare and execute SQL
-    $stmt = $con->prepare("INSERT INTO tblmedicalhistory (PatientID, BloodPressure, BloodSugar, Weight, Temperature, MedicalPres, ChronicCond, PrevDen) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("isssssss", $vid, $bp, $bs, $weight, $temp, $pres, $chronic, $prev);
+    $query = mysqli_query($con, "INSERT INTO tblmedicalhistory (PatientID, BloodPressure, BloodSugar, Weight, Temperature, MedicalPres, ChronicCond, PrevDen) VALUES ('$vid', '$bp', '$bs', '$weight', '$temp', '$pres', '$chronic', '$prev')");
 
-    if ($stmt->execute()) {
+    if ($query) {
         $successMessage = "Medical history has been added.";
     } else {
-        $errorMessage = "Something went wrong: " . $stmt->error; // Show SQL error
+        $errorMessage = "Something went wrong. Please try again.";
     }
-
-    $stmt->close();
 }
 
-// Check patient ID
-$vid = $_GET['viewid'];
-$ret = mysqli_query($con, "SELECT * FROM tblpatient WHERE ID='$vid'");
-if (!$ret) {
-    die("Query failed: " . mysqli_error($con)); // Show SQL error
+if (isset($_POST["btnUpload"])) {
+    $filename = $_FILES["file"]["tmp_name"];
+    if ($_FILES["file"]["size"] > 0) {
+        $file = fopen($filename, "r");
+        $row = 1;
+
+        while (($data = fgetcsv($file, 10000, ",")) !== FALSE) {
+            $bp = $bs = $weight = $temp = $pres = $chronic = $prev = "";
+
+            if ($row == 1) { // Skip the header row
+                $row++;
+                continue;
+            }
+
+            // Retrieve and sanitize each column
+            $bp = !empty($data[0]) ? $data[0] : '';
+            $bs = !empty($data[1]) ? $data[1] : '';
+            $weight = !empty($data[2]) ? $data[2] : '';
+            $temp = !empty($data[3]) ? $data[3] : '';
+            $pres = !empty($data[4]) ? $data[4] : '';
+            $chronic = !empty($data[5]) ? $data[5] : '';
+            $prev = !empty($data[6]) ? $data[6] : '';
+
+            if (!empty($bp) && !empty($bs) && !empty($weight) && !empty($temp) && !empty($pres) && !empty($chronic) && !empty($prev)) {
+                mysqli_query($con, "INSERT INTO tblmedicalhistory (PatientID, BloodPressure, BloodSugar, Weight, Temperature, MedicalPres, ChronicCond, PrevDen) VALUES ('$vid', '$bp', '$bs', '$weight', '$temp', '$pres', '$chronic', '$prev')");
+            }
+            $row++;
+        }
+
+        fclose($file);
+        $successMessage = "Medical records from Excel file have been uploaded successfully.";
+    } else {
+        $errorMessage = "Failed to upload the Excel file. Please try again.";
+    }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Doctor | Manage Patients</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Users | Medical History Upload</title>
+
     <link href="http://fonts.googleapis.com/css?family=Lato:300,400,400italic,600,700|Raleway:300,400,500,600,700|Crete+Round:400italic" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="vendor/fontawesome/css/font-awesome.min.css">
@@ -62,8 +84,9 @@ if (!$ret) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
-    <div id="app">
+    <div id="app"><?php include('include/footer.php');?> 
         <?php include('include/sidebar.php'); ?>
         <div class="app-content">
             <?php include('include/header.php'); ?>
@@ -72,96 +95,63 @@ if (!$ret) {
                     <section id="page-title">
                         <div class="row">
                             <div class="col-sm-8">
-                                <h1 class="mainTitle">Doctor | Manage Patients</h1>
+                                <h1 class="mainTitle">Users | Medical History Upload</h1>
                             </div>
                             <ol class="breadcrumb">
-                                <li>
-                                    <span>Doctor</span>
-                                </li>
-                                <li class="active">
-                                    <span>Manage Patients</span>
-                                </li>
+                                <li><span>Users</span></li>
+                                <li class="active"><span>Medical History</span></li>
                             </ol>
                         </div>
                     </section>
+
                     <div class="container-fluid container-fullw bg-white">
                         <div class="row">
                             <div class="col-md-12">
-                                <h5 class="over-title margin-bottom-15">Manage <span class="text-bold">Patients</span></h5>
+                                <h5 class="over-title margin-bottom-15">Patient <span class="text-bold">Details</span></h5>
+
+                                <!-- Patient Details Table -->
                                 <?php
                                 $vid = $_GET['viewid'];
                                 $ret = mysqli_query($con, "SELECT * FROM tblpatient WHERE ID='$vid'");
-                                $cnt = 1;
                                 while ($row = mysqli_fetch_array($ret)) {
                                 ?>
-                                <table border="1" class="table table-bordered">
-                                    <tr align="center">
-                                        <td colspan="4" style="font-size:20px;color:blue">Patient Details</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope>Patient Name</th>
-                                        <td><?php echo $row['PatientName']; ?></td>
-                                        <th scope>Patient Email</th>
-                                        <td><?php echo $row['PatientEmail']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th scope>Patient Mobile Number</th>
-                                        <td><?php echo $row['PatientContno']; ?></td>
-                                        <th>Patient Address</th>
-                                        <td><?php echo $row['PatientAdd']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Patient Gender</th>
-                                        <td><?php echo $row['PatientGender']; ?></td>
-                                        <th>Patient Age</th>
-                                        <td><?php echo $row['PatientAge']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Patient Medical History (if any)</th>
-                                        <td><?php echo $row['PatientMedhis']; ?></td>
-                                        <th>Patient Reg Date</th>
-                                        <td><?php echo $row['CreationDate']; ?></td>
-                                    </tr>
-                                </table>
+                                    <table class="table table-bordered">
+                                        <tr align="center">
+                                            <td colspan="4" style="font-size:20px;color:blue">Patient Details</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Patient Name</th>
+                                            <td><?php echo $row['PatientName']; ?></td>
+                                            <th>Patient Email</th>
+                                            <td><?php echo $row['PatientEmail']; ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Patient Mobile Number</th>
+                                            <td><?php echo $row['PatientContno']; ?></td>
+                                            <th>Patient Address</th>
+                                            <td><?php echo $row['PatientAdd']; ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Patient Gender</th>
+                                            <td><?php echo $row['PatientGender']; ?></td>
+                                            <th>Patient Age</th>
+                                            <td><?php echo $row['PatientAge']; ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Patient Medical History (if any)</th>
+                                            <td><?php echo $row['PatientMedhis']; ?></td>
+                                            <th>Patient Reg Date</th>
+                                            <td><?php echo $row['CreationDate']; ?></td>
+                                        </tr>
+                                    </table>
                                 <?php } ?>
-                                <?php
-                                $ret = mysqli_query($con, "SELECT * FROM tblmedicalhistory WHERE PatientID='$vid'");
-                                ?>
-                                <table id="datatable" class="table table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                                    <tr align="center">
-                                        <th colspan="8">Medical History</th>
-                                    </tr>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Blood Pressure</th>
-                                        <th>Weight</th>
-                                        <th>Blood Sugar</th>
-                                        <th>Body Temperature</th>
-                                        <th>Medical Prescription</th>
-                                        <th>Chronic Conditions</th>
-                                        <th>Previous Dental Treatments</th>
-                                        <th>Visit Date</th>
-                                    </tr>
-                                    <?php
-                                    $cnt = 1;
-                                    while ($row = mysqli_fetch_array($ret)) {
-                                    ?>
-                                    <tr>
-                                        <td><?php echo $cnt; ?></td>
-                                        <td><?php echo $row['BloodPressure']; ?></td>
-                                        <td><?php echo $row['Weight']; ?></td>
-                                        <td><?php echo $row['BloodSugar']; ?></td>
-                                        <td><?php echo $row['Temperature']; ?></td>
-                                        <td><?php echo $row['MedicalPres']; ?></td>
-                                        <td><?php echo $row['ChronicCond']; ?></td>
-                                        <td><?php echo $row['PrevDen']; ?></td>
-                                        <td><?php echo $row['CreationDate']; ?></td>
-                                    </tr>
-                                    <?php $cnt = $cnt + 1; } ?>
-                                </table>
+
+                                <!-- Button to Add Medical History Manually -->
                                 <p align="center">
                                     <button class="btn btn-primary waves-effect waves-light w-lg" data-toggle="modal" data-target="#myModal">Add Medical History</button>
                                 </p>
+
+                                <!-- Modal for Adding Medical History -->
                                 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
                                         <div class="modal-content">
@@ -212,6 +202,17 @@ if (!$ret) {
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Form for Uploading Medical History via Excel File -->
+                                <h5 class="margin-top-30">Upload <span class="text-bold">Medical Records via Excel</span></h5>
+                                <form method="POST" enctype="multipart/form-data">
+                                    <div class="form-group">
+                                        <input type="file" name="file" class="form-control-file">
+                                    </div>
+                                    <button type="submit" name="btnUpload" class="btn btn-primary">Upload Medical Records</button>
+                                </form>
+
+                                <!-- SweetAlert Messages -->
                                 <?php if (isset($successMessage)): ?>
                                     <script>
                                         Swal.fire({
@@ -232,20 +233,23 @@ if (!$ret) {
                             </div>
                         </div>
                     </div>
+                    <?php include('include/setting.php'); ?>
                 </div>
             </div>
         </div>
     </div>
+
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="vendor/jquery-easypiechart/jquery.easypiechart.min.js"></script>
+    <script src="vendor/modernizr/modernizr.js"></script>
+    <script src="vendor/jquery-cookie/jquery.cookie.js"></script>
     <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <script src="vendor/switchery/switchery.min.js"></script>
-    <script src="vendor/select2/select2.min.js"></script>
-    <script src="vendor/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
-    <script src="vendor/bootstrap-timepicker/bootstrap-timepicker.min.js"></script>
-    <script src="vendor/modernizr/modernizr.custom.js"></script>
     <script src="assets/js/main.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2@11"></script>
+    <script>
+        jQuery(document).ready(function() {
+            Main.init();
+        });
+    </script>
 </body>
 </html>

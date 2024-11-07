@@ -4,175 +4,139 @@ error_reporting(0);
 include('include/config.php');
 include('include/checklogin.php');
 check_login();
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'doctor') {
-    header("Location: error.php"); // Redirect to an error page or home page
+    header("Location: error.php");
     exit();
 }
 
-if(isset($_GET['cancel'])) {
+if (isset($_GET['cancel'])) {
     $stmt = $con->prepare("UPDATE appointment SET doctorStatus='0' WHERE id=?");
     $stmt->bind_param("i", $_GET['id']);
     $stmt->execute();
     $_SESSION['msg'] = "Appointment canceled !!";
+    $_SESSION['msg_type'] = "error";
 }
-if(isset($_GET['complete'])) {
+
+if (isset($_GET['complete'])) {
     $stmt = $con->prepare("UPDATE appointment SET doctorStatus='2' WHERE id=?");
     $stmt->bind_param("i", $_GET['id']);
     $stmt->execute();
     $_SESSION['msg'] = "Appointment marked as successful!";
+    $_SESSION['msg_type'] = "success";
 }
-	
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>Doctor | Appointment History</title>
-		
-		<link href="http://fonts.googleapis.com/css?family=Lato:300,400,400italic,600,700|Raleway:300,400,500,600,700|Crete+Round:400italic" rel="stylesheet" type="text/css" />
-		<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
-		<link rel="stylesheet" href="vendor/fontawesome/css/font-awesome.min.css">
-		<link rel="stylesheet" href="vendor/themify-icons/themify-icons.min.css">
-		<link href="vendor/animate.css/animate.min.css" rel="stylesheet" media="screen">
-		<link href="vendor/perfect-scrollbar/perfect-scrollbar.min.css" rel="stylesheet" media="screen">
-		<link href="vendor/switchery/switchery.min.css" rel="stylesheet" media="screen">
-		<link href="vendor/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css" rel="stylesheet" media="screen">
-		<link href="vendor/select2/select2.min.css" rel="stylesheet" media="screen">
-		<link href="vendor/bootstrap-datepicker/bootstrap-datepicker3.standalone.min.css" rel="stylesheet" media="screen">
-		<link href="vendor/bootstrap-timepicker/bootstrap-timepicker.min.css" rel="stylesheet" media="screen">
-		<link rel="stylesheet" href="assets/css/styles.css">
-		<link rel="stylesheet" href="assets/css/plugins.css">
-		<link rel="stylesheet" href="assets/css/themes/theme-1.css" id="skin_color" />
-	</head>
-	<body>
-		<div id="app">		
-<?php include('include/sidebar.php');?>
-			<div class="app-content">
-				
-
-					<?php include('include/header.php');?>
-				<!-- end: TOP NAVBAR -->
-				<div class="main-content" >
-					<div class="wrap-content container" id="container">
-						<!-- start: PAGE TITLE -->
-						<section id="page-title">
-							<div class="row">
-								<div class="col-sm-8">
-									<h1 class="mainTitle">Doctor  | Appointment History</h1>
-																	</div>
-								<ol class="breadcrumb">
-									<li>
-										<span>Doctor </span>
-									</li>
-									<li class="active">
-										<span>Appointment History</span>
-									</li>
-								</ol>
-							</div>
-						</section>
-						<!-- end: PAGE TITLE -->
-						<!-- start: BASIC EXAMPLE -->
-						<div class="container-fluid container-fullw bg-white">
-						
-
-									<div class="row">
-								<div class="col-md-12">
-									
-									<p style="color:red;"><?php echo htmlentities($_SESSION['msg']);?>
-								<?php echo htmlentities($_SESSION['msg']="");?></p>	
-									<table class="table table-hover" id="sample-table-1">
-										<thead>
-											<tr>
-												<th class="center">#</th>
-												<th class="hidden-xs">Patient  Name</th>
-												<th>Specialization</th>
-												<th>Consultancy Fee</th>
-												<th>Appointment Date / Time </th>
-												<th>Appointment Creation Date  </th>
-												<th>Current Status</th>
-												<th>Action</th>
-												
-											</tr>
-										</thead>
-										<tbody>
-<?php
-$sql=mysqli_query($con,"select users.fullName as fname,appointment.*  from appointment join users on users.id=appointment.userId where appointment.doctorId='".$_SESSION['id']."'");
-$cnt=1;
-while($row=mysqli_fetch_array($sql))
-{
-?>
-
-<tr>
-											<td class="center"><?php echo $cnt;?>.</td>
-											<td class="hidden-xs"><?php echo $row['fname'];?></td>
-											<td><?php echo $row['doctorSpecialization'];?></td>
-											<td><?php echo $row['consultancyFees'];?></td>
-											<td><?php echo $row['appointmentDate'];?> / <?php echo
-											 $row['appointmentTime'];?>
-											</td>
-											<td><?php echo $row['postingDate'];?></td>
-											<td>
-<?php 
-if ($row['userStatus'] == 1 && $row['doctorStatus'] == 1) {
-    echo "Active";
-} elseif ($row['userStatus'] == 0 && $row['doctorStatus'] == 1) {
-    echo "Canceled by Patient";
-} elseif ($row['userStatus'] == 1 && $row['doctorStatus'] == 0) {
-    echo "Canceled by Doctor";
-} elseif ($row['doctorStatus'] == 2) {
-    echo "Completed";
-}
-?>
-</td>
-<td></td>
-<td>
-<?php 
-
-if ($row['userStatus'] == 1 && $row['doctorStatus'] == 1) { ?>
-    <a href="appointment-history.php?id=<?php echo $row['id']?>&cancel=update" 
-       onClick="return confirm('Are you sure you want to cancel this appointment?')" 
-       class="btn btn-danger btn-xs tooltips" title="Cancel Appointment">
-       Cancel
-    </a>
-    <a href="appointment-history.php?id=<?php echo $row['id']?>&complete=update" 
-       onClick="return confirm('Are you sure you want to mark this appointment as successful?')" 
-       class="btn btn-success btn-xs tooltips" title="Mark as Successful">
-       Successful
-    </a>
-<?php } else { ?>
+<head>
+    <title>Doctor | Appointment History</title>
     
-<?php } ?>
-</td>
+    <link href="http://fonts.googleapis.com/css?family=Lato:300,400,400italic,600,700|Raleway:300,400,500,600,700|Crete+Round:400italic" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="vendor/themify-icons/themify-icons.min.css">
+    <link href="vendor/animate.css/animate.min.css" rel="stylesheet" media="screen">
+    <link href="vendor/perfect-scrollbar/perfect-scrollbar.min.css" rel="stylesheet" media="screen">
+    <link href="vendor/switchery/switchery.min.css" rel="stylesheet" media="screen">
+    <link href="vendor/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css" rel="stylesheet" media="screen">
+    <link href="vendor/select2/select2.min.css" rel="stylesheet" media="screen">
+    <link href="vendor/bootstrap-datepicker/bootstrap-datepicker3.standalone.min.css" rel="stylesheet" media="screen">
+    <link href="vendor/bootstrap-timepicker/bootstrap-timepicker.min.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/plugins.css">
+    <link rel="stylesheet" href="assets/css/themes/theme-1.css" id="skin_color" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div id="app"> <?php include('include/footer.php');?>        
+        <?php include('include/sidebar.php'); ?>
+        <div class="app-content">
+            <?php include('include/header.php'); ?>
+            <div class="main-content">
+                <div class="wrap-content container" id="container">
+                    <section id="page-title">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <h1 class="mainTitle">Doctor | Appointment History</h1>
+                            </div>
+                            <ol class="breadcrumb">
+                                <li>
+                                    <span>Doctor</span>
+                                </li>
+                                <li class="active">
+                                    <span>Appointment History</span>
+                                </li>
+                            </ol>
+                        </div>
+                    </section>
+                    <div class="container-fluid container-fullw bg-white">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-hover" id="sample-table-1">
+                                    <thead>
+                                        <tr>
+                                            <th class="center">#</th>
+                                            <th class="hidden-xs">Patient Name</th>
+                                            <th>Specialization</th>
+                                            <th>Consultancy Fee</th>
+                                            <th>Appointment Date / Time</th>
+                                            <th>Appointment Creation Date</th>
+                                            <th>Current Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php
+                                    $sql = mysqli_query($con, "SELECT users.fullName as fname, appointment.* FROM appointment JOIN users ON users.id = appointment.userId WHERE appointment.doctorId = '" . $_SESSION['id'] . "'");
+                                    $cnt = 1;
+                                    while ($row = mysqli_fetch_array($sql)) {
+                                    ?>
+                                        <tr>
+                                            <td class="center"><?php echo $cnt; ?>.</td>
+                                            <td class="hidden-xs"><?php echo $row['fname']; ?></td>
+                                            <td><?php echo $row['doctorSpecialization']; ?></td>
+                                            <td><?php echo $row['consultancyFees']; ?></td>
+                                            <td><?php echo $row['appointmentDate']; ?> / <?php echo $row['appointmentTime']; ?></td>
+                                            <td><?php echo $row['postingDate']; ?></td>
+                                            <td>
+                                                <?php 
+                                                if ($row['userStatus'] == 1 && $row['doctorStatus'] == 1) {
+                                                    echo "Active";
+                                                } elseif ($row['userStatus'] == 0 && $row['doctorStatus'] == 1) {
+                                                    echo "Canceled by Patient";
+                                                } elseif ($row['userStatus'] == 1 && $row['doctorStatus'] == 0) {
+                                                    echo "Canceled by Doctor";
+                                                } elseif ($row['doctorStatus'] == 2) {
+                                                    echo "Completed";
+                                                }
+                                                ?>
+                                            </td>
+                                            <td>
+                                                <?php if ($row['userStatus'] == 1 && $row['doctorStatus'] == 1) { ?>
+                                                    <button onclick="confirmAction('cancel', '<?php echo $row['id']; ?>')" class="btn btn-danger btn-xs" title="Cancel Appointment">Cancel</button>
+                                                    <button onclick="confirmAction('complete', '<?php echo $row['id']; ?>')" class="btn btn-success btn-xs" title="Mark as Successful">Successful</button>
+                                                <?php } ?>
+                                            </td>
+                                        </tr>
+                                    <?php 
+                                    $cnt = $cnt + 1;
+                                    } ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <?php include('include/setting.php'); ?>
+                </div>
+            </div>
+        </div>
+    </div>
 
-
-	
-
-											
-											<?php 
-$cnt=$cnt+1;
-											 }?>
-											
-											
-										</tbody>
-									</table>
-								</div>
-							</div>
-								</div>
-						
-						<!-- end: BASIC EXAMPLE -->
-						<!-- end: SELECT BOXES -->
-						
-					</div>
-				</div>
-			</div>
-			<!-- start: FOOTER -->
-	<?php include('include/footer.php');?>
-			<!-- end: FOOTER -->
-		
-			<!-- start: SETTINGS -->
-	<?php include('include/setting.php');?>
-			
-			<!-- end: SETTINGS -->
-		</div>
+  
+	</div>
 		<!-- start: MAIN JAVASCRIPTS -->
 		<script src="vendor/jquery/jquery.min.js"></script>
 		<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
@@ -196,12 +160,42 @@ $cnt=$cnt+1;
 		<!-- start: JavaScript Event Handlers for this page -->
 		<script src="assets/js/form-elements.js"></script>
 		<script>
-			jQuery(document).ready(function() {
-				Main.init();
-				FormElements.init();
-			});
-		</script>
-		<!-- end: JavaScript Event Handlers for this page -->
-		<!-- end: CLIP-TWO JAVASCRIPTS -->
-	</body>
+        jQuery(document).ready(function() {
+            Main.init();
+
+            <?php if (isset($_SESSION['msg']) && $_SESSION['msg'] != ""): ?>
+                Swal.fire({
+                    icon: '<?php echo $_SESSION['msg_type']; ?>',
+                    title: '<?php echo $_SESSION['msg_type'] == "success" ? "Success!" : "Cancelled!"; ?>',
+                    text: "<?php echo $_SESSION['msg']; ?>"
+                }).then(() => {
+                    <?php
+                    unset($_SESSION['msg']);
+                    unset($_SESSION['msg_type']);
+                    ?>
+                });
+            <?php endif; ?>
+        });
+
+        function confirmAction(action, id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: action === 'cancel' ? "Do you want to cancel this appointment?" : "Do you want to mark this appointment as successful?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, proceed!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (action === 'cancel') {
+                        window.location.href = 'appointment-history.php?id=' + id + '&cancel=update';
+                    } else if (action === 'complete') {
+                        window.location.href = 'appointment-history.php?id=' + id + '&complete=update';
+                    }
+                }
+            });
+        }
+    </script>
+</body>
 </html>
