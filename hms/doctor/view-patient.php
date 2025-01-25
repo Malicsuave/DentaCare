@@ -1,6 +1,6 @@
 <?php
-session_start();
-error_reporting(0);
+
+error_reporting(E_ALL); // Show all errors for debugging
 include('include/config.php');
 include('include/checklogin.php');
 check_login();
@@ -20,7 +20,7 @@ if (isset($_POST['submit'])) {
     if ($query) {
         $successMessage = "Medical history has been added.";
     } else {
-        $errorMessage = "Something went wrong. Please try again.";
+        $errorMessage = "Something went wrong. Please try again. " . mysqli_error($con);
     }
 }
 
@@ -29,10 +29,9 @@ if (isset($_POST["btnUpload"])) {
     if ($_FILES["file"]["size"] > 0) {
         $file = fopen($filename, "r");
         $row = 1;
+        $vid = $_GET['viewid']; // Make sure to get the Patient ID
 
         while (($data = fgetcsv($file, 10000, ",")) !== FALSE) {
-            $bp = $bs = $weight = $temp = $pres = $chronic = $prev = "";
-
             if ($row == 1) { // Skip the header row
                 $row++;
                 continue;
@@ -47,19 +46,30 @@ if (isset($_POST["btnUpload"])) {
             $chronic = !empty($data[5]) ? $data[5] : '';
             $prev = !empty($data[6]) ? $data[6] : '';
 
+            // Ensure no empty values for important fields
             if (!empty($bp) && !empty($bs) && !empty($weight) && !empty($temp) && !empty($pres) && !empty($chronic) && !empty($prev)) {
-                mysqli_query($con, "INSERT INTO tblmedicalhistory (PatientID, BloodPressure, BloodSugar, Weight, Temperature, MedicalPres, ChronicCond, PrevDen) VALUES ('$vid', '$bp', '$bs', '$weight', '$temp', '$pres', '$chronic', '$prev')");
+                $insertQuery = mysqli_query($con, "INSERT INTO tblmedicalhistory (PatientID, BloodPressure, BloodSugar, Weight, Temperature, MedicalPres, ChronicCond, PrevDen) VALUES ('$vid', '$bp', '$bs', '$weight', '$temp', '$pres', '$chronic', '$prev')");
+                if (!$insertQuery) {
+                    $errorMessage = "Error inserting row $row: " . mysqli_error($con);
+                    break; // Stop if any row fails to insert
+                }
+            } else {
+                $errorMessage = "Some fields in row $row are empty, skipping insertion.";
             }
             $row++;
         }
 
         fclose($file);
-        $successMessage = "Medical records from Excel file have been uploaded successfully.";
+
+        if (!isset($errorMessage)) {
+            $successMessage = "Medical records from Excel file have been uploaded successfully.";
+        }
     } else {
         $errorMessage = "Failed to upload the Excel file. Please try again.";
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -162,7 +172,7 @@ if (isset($_POST["btnUpload"])) {
                                                 </button>
                                             </div>
                                             <div class="modal-body">
-                                                <form method="post" name="submit">
+                                                <form method="post" name="submit" action="">
                                                     <table class="table table-bordered table-hover data-tables">
                                                         <tr>
                                                             <th>Blood Pressure :</th>
@@ -211,6 +221,40 @@ if (isset($_POST["btnUpload"])) {
                                     </div>
                                     <button type="submit" name="btnUpload" class="btn btn-primary">Upload Medical Records</button>
                                 </form>
+
+                                <!-- Display Uploaded Medical History Table -->
+                                <h5 class="margin-top-30">Existing <span class="text-bold">Medical History</span></h5>
+                                <table class="table table-bordered">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Blood Pressure</th>
+                                            <th>Blood Sugar</th>
+                                            <th>Weight</th>
+                                            <th>Temperature</th>
+                                            <th>Medical Prescription</th>
+                                            <th>Chronic Conditions</th>
+                                            <th>Previous Dental Treatments</th>
+                                            <th>Visit Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $ret = mysqli_query($con, "SELECT * FROM tblmedicalhistory WHERE PatientID='$vid'");
+                                        while ($row = mysqli_fetch_array($ret)) {
+                                            echo "<tr>
+                                                <td>{$row['BloodPressure']}</td>
+                                                <td>{$row['BloodSugar']}</td>
+                                                <td>{$row['Weight']}</td>
+                                                <td>{$row['Temperature']}</td>
+                                                <td>{$row['MedicalPres']}</td>
+                                                <td>{$row['ChronicCond']}</td>
+                                                <td>{$row['PrevDen']}</td>
+                                                <td>{$row['CreationDate']}</td>
+                                            </tr>";
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
 
                                 <!-- SweetAlert Messages -->
                                 <?php if (isset($successMessage)): ?>

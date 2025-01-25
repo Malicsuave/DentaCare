@@ -1,4 +1,4 @@
-<?php
+ <?php
 session_start();
 error_reporting(0);
 include("include/config.php");
@@ -28,7 +28,7 @@ header("location:http://$host$uri/$extra");
 exit();
 }
 }
-?>
+?> 
 
 
 <!DOCTYPE html>
