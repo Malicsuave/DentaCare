@@ -1,23 +1,49 @@
 <?php
-session_start();
+session_start([
+    'cookie_lifetime' => 86400,
+    'cookie_secure' => true,
+    'cookie_httponly' => true,
+    'cookie_samesite' => 'Strict',
+]);
+
 include('include/config.php');
 include('include/checklogin.php');
 check_login();
 
+
+
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'user') {
+    $_SESSION['msg'] = 'Unauthorized access attempt logged';
+    $_SESSION['msg_type'] = 'error';
+    error_log('Unauthorized access attempt from IP: ' . $_SERVER['REMOTE_ADDR']);
     header("Location: error.php");
     exit();
 }
+
+session_regenerate_id(true);
 
 date_default_timezone_set('Asia/Kolkata');
 $currentTime = date('d-m-Y h:i:s A', time());
 
 if (isset($_POST['submit'])) {
-    $sql = mysqli_query($con, "SELECT password FROM users WHERE password='" . md5($_POST['cpass']) . "' AND id='" . $_SESSION['id'] . "'");
-    $num = mysqli_fetch_array($sql);
-    
-    if ($num > 0) {
-        $con = mysqli_query($con, "UPDATE users SET password='" . md5($_POST['npass']) . "', updationDate='$currentTime' WHERE id='" . $_SESSION['id'] . "'");
+    $sql = mysqli_prepare($con, "SELECT password FROM users WHERE id=?");
+    mysqli_stmt_bind_param($sql, 'i', $_SESSION['id']);
+    mysqli_stmt_execute($sql);
+    mysqli_stmt_bind_result($sql, $hashedPassword);
+    mysqli_stmt_fetch($sql);
+    mysqli_stmt_close($sql);
+
+    // Debugging: Check if the hashed password is retrieved correctly
+    error_log("Hashed Password from DB: " . $hashedPassword);
+    error_log("Entered Current Password: " . $_POST['cpass']);
+
+    if (password_verify($_POST['cpass'], $hashedPassword)) {
+        $newPasswordHash = password_hash($_POST['npass'], PASSWORD_BCRYPT);
+        $updateSql = mysqli_prepare($con, "UPDATE users SET password=?, updationDate=? WHERE id=?");
+        mysqli_stmt_bind_param($updateSql, 'ssi', $newPasswordHash, $currentTime, $_SESSION['id']);
+        mysqli_stmt_execute($updateSql);
+        mysqli_stmt_close($updateSql);
         $_SESSION['msg1'] = "Password Changed Successfully !!";
         $_SESSION['msg_type'] = "success";
     } else {
@@ -87,15 +113,15 @@ if (isset($_POST['submit'])) {
                                                 <form role="form" name="chngpwd" method="post" onSubmit="return valid();">
                                                     <div class="form-group">
                                                         <label for="exampleInputEmail1">Current Password</label>
-                                                        <input type="password" name="cpass" class="form-control" placeholder="Enter Current Password">
+                                                        <input type="password" name="cpass" class="form-control" placeholder="Enter Current Password" required>
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="exampleInputPassword1">New Password</label>
-                                                        <input type="password" name="npass" class="form-control" placeholder="New Password">
+                                                        <input type="password" name="npass" class="form-control" placeholder="New Password" required>
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="exampleInputPassword1">Confirm Password</label>
-                                                        <input type="password" name="cfpass" class="form-control" placeholder="Confirm Password">
+                                                        <input type="password" name="cfpass" class="form-control" placeholder="Confirm Password" required>
                                                     </div>
                                                     <button type="submit" name="submit" class="btn btn-o btn-primary">Submit</button>
                                                 </form>
@@ -112,27 +138,26 @@ if (isset($_POST['submit'])) {
         </div>
     </div>
 
-	<script src="vendor/jquery/jquery.min.js"></script>
-		<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-		<script src="vendor/modernizr/modernizr.js"></script>
-		<script src="vendor/jquery-cookie/jquery.cookie.js"></script>
-		<script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
-		<script src="vendor/switchery/switchery.min.js"></script>
-		<!-- end: MAIN JAVASCRIPTS -->
-		<!-- start: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
-		<script src="vendor/maskedinput/jquery.maskedinput.min.js"></script>
-		<script src="vendor/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js"></script>
-		<script src="vendor/autosize/autosize.min.js"></script>
-		<script src="vendor/selectFx/classie.js"></script>
-		<script src="vendor/selectFx/selectFx.js"></script>
-		<script src="vendor/select2/select2.min.js"></script>
-		<script src="vendor/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
-		<script src="vendor/bootstrap-timepicker/bootstrap-timepicker.min.js"></script>
-		<!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
-		<!-- start: CLIP-TWO JAVASCRIPTS -->
-		<script src="assets/js/main.js"></script>
-		<!-- start: JavaScript Event Handlers for this page -->
-		<script src="assets/js/form-elements.js"></script>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="vendor/modernizr/modernizr.js"></script>
+    <script src="vendor/jquery-cookie/jquery.cookie.js"></script>
+    <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="vendor/switchery/switchery.min.js"></script>
+    <!-- end: MAIN JAVASCRIPTS -->
+    <!-- start: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
+    <script src="vendor/maskedinput/jquery.maskedinput.min.js"></script>
+    <script src="vendor/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js"></script>
+    <script src="vendor/autosize/autosize.min.js"></script>
+    <script src="vendor/selectFx/classie.js"></script>
+    <script src="vendor/selectFx/selectFx.js"></script>
+    <script src="vendor/select2/select2.min.js"></script>
+    <script src="vendor/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+    <script src="vendor/bootstrap-timepicker/bootstrap-timepicker.min.js"></script>
+    <!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
+    <!-- start: CLIP-TWO JAVASCRIPTS -->
+    <script src="assets/js/main.js"></script>
+    <!-- start: JavaScript Event Handlers for this page -->
     <script src="assets/js/form-elements.js"></script>
     <script>
         jQuery(document).ready(function() {

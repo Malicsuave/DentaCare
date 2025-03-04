@@ -1,10 +1,12 @@
 <?php
 session_start();
-require_once('../TCPDF-main/tcpdf.php'); 
+include('../include/config.php');
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: error.php"); // Redirect to an error page or home page
+    header("Location: error.php");
     exit();
 }
+
+require_once('../TCPDF-main/tcpdf.php');
 
 // Create new PDF document
 $pdf = new TCPDF();
@@ -13,10 +15,9 @@ $pdf = new TCPDF();
 $pdf->SetCreator(PDF_CREATOR);
 $pdf->SetAuthor('DentaCare');
 $pdf->SetTitle('Doctor Session Logs');
-$pdf->SetSubject('Session Logs');
 
 // Set header data
-$pdf->SetHeaderData('', 0, 'DentaCare', 'Doctor Session Logs', array(0, 64, 255), array(0, 64, 128)); // Header title and subtitle
+$pdf->SetHeaderData('', 0, 'DentaCare', 'Doctor Session Logs', array(0, 64, 255), array(0, 64, 128));
 
 // Set header and footer fonts
 $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
@@ -37,34 +38,42 @@ $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 $pdf->AddPage();
 
 // Set font
-$pdf->SetFont('helvetica', '', 12);
+$pdf->SetFont('helvetica', '', 10);
 
-// Fetch data from the database
-include('../include/config.php'); // Ensure this path is correct
-$sql = mysqli_query($con, "SELECT * FROM doctorslog");
+// Add HTML content
 $html = '<h1>Doctor Session Logs</h1>';
-$html .= '<table border="1" cellpadding="5">';
-$html .= '<tr><th>#</th><th>User ID</th><th>Username</th><th>User IP</th><th>Login Time</th><th>Logout Time</th><th>Status</th></tr>';
+$html .= '<table border="1" cellpadding="4">
+            <tr style="background-color: #f5f5f5; font-weight: bold;">
+                <th>#</th>
+                <th>User ID</th>
+                <th>Username</th>
+                <th>User IP</th>
+                <th>Login Time</th>
+                <th>Logout Time</th>
+                <th>Status</th>
+            </tr>';
 
+$sql = mysqli_query($con, "SELECT * FROM doctorslog ORDER BY loginTime DESC");
 $cnt = 1;
-while ($row = mysqli_fetch_array($sql)) {
-    $html .= '<tr>';
-    $html .= '<td>' . $cnt . '</td>';
-    $html .= '<td>' . $row['uid'] . '</td>';
-    $html .= '<td>' . $row['username'] . '</td>';
-    $html .= '<td>' . $row['userip'] . '</td>';
-    $html .= '<td>' . $row['loginTime'] . '</td>';
-    $html .= '<td>' . $row['logout'] . '</td>';
-    $html .= '<td>' . ($row['status'] == 1 ? 'Success' : 'Failed') . '</td>';
-    $html .= '</tr>';
+while($row = mysqli_fetch_array($sql)) {
+    $status = ($row['status'] == 1) ? 'Success' : 'Failed';
+    $html .= '<tr>
+                <td>'.$cnt.'</td>
+                <td>'.$row['uid'].'</td>
+                <td>'.$row['username'].'</td>
+                <td>'.$row['userip'].'</td>
+                <td>'.$row['loginTime'].'</td>
+                <td>'.$row['logout'].'</td>
+                <td>'.$status.'</td>
+              </tr>';
     $cnt++;
 }
+
 $html .= '</table>';
 
-// Print text using writeHTMLCell()
-$pdf->writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
+// Output the HTML content
+$pdf->writeHTML($html, true, false, true, false, '');
 
 // Close and output PDF document
-$pdf->Output('doctor_session_logs.pdf', 'I'); // Output to browser
+$pdf->Output('doctor_session_logs.pdf', 'I');
 ?>
- 

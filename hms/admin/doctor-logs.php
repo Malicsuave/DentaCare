@@ -1,5 +1,6 @@
 <?php
 session_start();
+ob_start();
 //error_reporting(0);
 include('include/config.php');
 include('include/checklogin.php');
@@ -64,35 +65,39 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                                     <thead>
                                         <tr>
                                             <th class="center">#</th>
-                                            <th class="hidden-xs">User id</th>
+                                            <th class="hidden-xs">User ID</th>
                                             <th>Username</th>
                                             <th>User IP</th>
-                                            <th>Login time</th>
-                                            <th>Logout Time </th>
+                                            <th>Time</th>
+                                            <th>Action</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
 <?php
-$sql=mysqli_query($con,"select * from doctorslog");
-$cnt=1;
-while($row=mysqli_fetch_array($sql))
-{
+// Fetch data from the doctorlogs table using prepared statements
+$stmt = $con->prepare("SELECT * FROM doctorslog");
+$stmt->execute();
+$result = $stmt->get_result();
+$cnt = 1;
+while ($row = $result->fetch_assoc()) {
 ?>
                                         <tr>
                                             <td class="center"><?php echo $cnt;?>.</td>
-                                            <td class="hidden-xs"><?php echo $row['uid'];?></td>
-                                            <td class="hidden-xs"><?php echo $row['username'];?></td>
-                                            <td><?php echo $row['userip'];?></td>
-                                            <td><?php echo $row['loginTime'];?></td>
-                                            <td><?php echo $row['logout'];?></td>
+                                            <td class="hidden-xs"><?php echo htmlentities($row['uid']);?></td>
+                                            <td class="hidden-xs"><?php echo htmlentities($row['username']);?></td>
+                                            <td><?php echo htmlentities($row['userip']);?></td>
+                                            <td><?php echo htmlentities($row['loginTime']);?></td>
+                                            <td><?php echo htmlentities($row['action']);?></td>
                                             <td>
 <?php if($row['status']==1) { echo "Success"; } else { echo "Failed"; } ?>
                                             </td>
                                         </tr>
 <?php 
-    $cnt=$cnt+1;
-} ?>
+    $cnt++;
+}
+$stmt->close();
+?>
                                     </tbody>
                                 </table>
                             </div>
@@ -102,9 +107,9 @@ while($row=mysqli_fetch_array($sql))
                                 <form action="doctor_pdf.php" method="post" style="display:inline;">
                                     <button type="submit" class="btn btn-danger">Export to PDF</button>
                                 </form>
-								<form action="doctor_excel.php" method="post" style="display:inline;">
-    								<button type="submit" class="btn btn-success">Export to Excel</button>
-								</form>
+                                <form action="doctor_excel.php" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-success">Export to Excel</button>
+                                </form>
 
                             </div>
                         </div>

@@ -1,6 +1,9 @@
 {
     "require": {
         "stripe/stripe-php": "^16.2",
-        "guzzlehttp/guzzle": "^7.9"
+        "guzzlehttp/guzzle": "^7.9",
+        "paypal/rest-api-sdk-php": "^1.14",
+        "paypal/paypal-checkout-sdk": "^1.0",
+        "paypal/paypal-server-sdk": "^0.6.1"
     }
 }

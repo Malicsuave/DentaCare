@@ -2,50 +2,45 @@
 session_start();
 include('include/config.php');
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: error.php"); // Redirect to an error page or home page
+    header("Location: error.php");
     exit();
 }
 
 // Set headers for Excel file
 header("Content-Type: application/vnd.ms-excel");
-header("Content-Disposition: attachment; filename=doctor_logs.xls");
+header("Content-Disposition: attachment; filename=doctor_session_logs.xls");
 
-// Fetch data from the doctorslog table
-$sql = mysqli_query($con, "SELECT * FROM doctorslog");
+// Start the HTML table
+echo '<table border="1">';
+echo '<tr>
+        <th style="background-color: #f5f5f5; font-weight: bold;">#</th>
+        <th style="background-color: #f5f5f5; font-weight: bold;">User ID</th>
+        <th style="background-color: #f5f5f5; font-weight: bold;">Username</th>
+        <th style="background-color: #f5f5f5; font-weight: bold;">User IP</th>
+        <th style="background-color: #f5f5f5; font-weight: bold;">Login Time</th>
+        <th style="background-color: #f5f5f5; font-weight: bold;">Logout Time</th>
+        <th style="background-color: #f5f5f5; font-weight: bold;">Status</th>
+      </tr>';
+
+$sql = mysqli_query($con, "SELECT * FROM doctorslog ORDER BY loginTime DESC");
 if (!$sql) {
     die('Query Failed: ' . mysqli_error($con));
 }
 
-// Output the table headers
-echo '<table border="1">';
-echo '<thead>';
-echo '<tr>';
-echo '<th>#</th>';
-echo '<th>User ID</th>';
-echo '<th>Username</th>';
-echo '<th>User IP</th>';
-echo '<th>Login Time</th>';
-echo '<th>Logout Time</th>';
-echo '<th>Status</th>';
-echo '</tr>';
-echo '</thead>';
-echo '<tbody>';
-
-// Output the data rows
 $cnt = 1;
-while ($row = mysqli_fetch_array($sql)) {
-    echo '<tr>';
-    echo '<td>' . $cnt . '</td>';
-    echo '<td>' . htmlentities($row['uid']) . '</td>';
-    echo '<td>' . htmlentities($row['username']) . '</td>';
-    echo '<td>' . htmlentities($row['userip']) . '</td>';
-    echo '<td>' . htmlentities($row['loginTime']) . '</td>';
-    echo '<td>' . htmlentities($row['logout']) . '</td>';
-    echo '<td>' . ($row['status'] == 1 ? "Success" : "Failed") . '</td>';
-    echo '</tr>';
+while($row = mysqli_fetch_array($sql)) {
+    $status = ($row['status'] == 1) ? 'Success' : 'Failed';
+    echo '<tr>
+            <td>'.$cnt.'</td>
+            <td>'.htmlspecialchars($row['uid']).'</td>
+            <td>'.htmlspecialchars($row['username']).'</td>
+            <td>'.htmlspecialchars($row['userip']).'</td>
+            <td>'.htmlspecialchars($row['loginTime']).'</td>
+            <td>'.htmlspecialchars($row['logout']).'</td>
+            <td>'.$status.'</td>
+          </tr>';
     $cnt++;
 }
 
-echo '</tbody>';
 echo '</table>';
 ?>

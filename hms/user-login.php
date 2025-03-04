@@ -22,6 +22,7 @@ if (isset($_SESSION['login_attempts']) && isset($_SESSION['lockout_time'])) {
     }
 }
 
+
 $alert_message = ""; // To store alert message for SweetAlert
 
 if (isset($_POST['submit'])) {
@@ -31,12 +32,17 @@ if (isset($_POST['submit'])) {
         $alert_message = "Too many login attempts. Please wait for a minute.";
     } else {
         // Fetch user data
-        $ret = mysqli_query($con, "SELECT * FROM users WHERE email='" . $_POST['username'] . "' and password='" . md5($_POST['password']) . "'");
-        $num = mysqli_fetch_array($ret);
+        $email = $_POST['username'];
+        $password = $_POST['password'];
+        $ret = mysqli_prepare($con, "SELECT * FROM users WHERE email=?");
+        mysqli_stmt_bind_param($ret, 's', $email);
+        mysqli_stmt_execute($ret);
+        $result = mysqli_stmt_get_result($ret);
+        $num = mysqli_fetch_array($result);
 
-        if ($num) {
+        if ($num && password_verify($password, $num['password'])) {
             // Successful login: reset attempts
-            $_SESSION['login'] = $_POST['username'];
+            $_SESSION['login'] = $email;
             $_SESSION['id'] = $num['id'];
             $_SESSION['role'] = 'user';
             $_SESSION['login_attempts'] = 0; // Reset login attempts
@@ -44,7 +50,7 @@ if (isset($_POST['submit'])) {
             $host = $_SERVER['HTTP_HOST'];
             $uip = $_SERVER['REMOTE_ADDR'];
             $status = 1;
-
+            session_regenerate_id(true);
             // Log successful login
             mysqli_query($con, "INSERT INTO userlog(uid, username, userip, status) VALUES('" . $_SESSION['id'] . "', '" . $_SESSION['login'] . "', '$uip', '$status')");
             $uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
@@ -52,7 +58,7 @@ if (isset($_POST['submit'])) {
             exit();
         } else {
             // Unsuccessful login
-            $_SESSION['login'] = $_POST['username'];
+            $_SESSION['login'] = $email;
             $uip = $_SERVER['REMOTE_ADDR'];
             $status = 0;
             mysqli_query($con, "INSERT INTO userlog(username, userip, status) VALUES('" . $_SESSION['login'] . "', '$uip', '$status')");
@@ -72,10 +78,10 @@ if (isset($_POST['submit'])) {
                 $lockout_active = true;
             }
         }
+        
     }
 }
 ?> 
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -111,7 +117,7 @@ if (isset($_POST['submit'])) {
                         </p>
                         <div class="form-group">
                             <span class="input-icon">
-                                <input type="text" class="form-control" name="username" placeholder="Username" <?php echo ($lockout_active ? 'disabled' : ''); ?>>
+                                <input type="text" class="form-control" name="username" placeholder="Email" <?php echo ($lockout_active ? 'disabled' : ''); ?>>
                                 <i class="fa fa-user"></i>
                             </span>
                         </div>

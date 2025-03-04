@@ -1,34 +1,45 @@
 <?php
+
+$cookieParams = session_get_cookie_params();
+session_set_cookie_params([
+    'lifetime' => $cookieParams['lifetime'],
+    'path' => $cookieParams['path'],
+    'domain' => $cookieParams['domain'],
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'Strict'
+]);
+
+
 session_start();
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 include('include/config.php');
 include('include/checklogin.php');
 check_login();
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'user') {
-    header("Location: error.php");
-    exit();
-}
+require '../vendor/autoload.php'; // Ensure PayPal SDK is loaded
 
-if (isset($_POST['submit']) || isset($_POST['pay_online'])) {
-    $specilization = $_POST['Doctorspecialization'];
-    $doctorid = $_POST['doctor'];
-    $userid = $_SESSION['id'];
-    $fees = $_POST['fees'];
-    $appdate = $_POST['appdate'];
-    $time = $_POST['apptime'];
-    $userstatus = 1;
-    $docstatus = 1;
+use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
+use PayPalCheckoutSdk\Core\PayPalHttpClient;
+use PayPalCheckoutSdk\Core\SandboxEnvironment;
+use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 
-    // Check if the selected date is in the past
+$clientId = 'AY-gfl-uXBUXsyYEhwRyW6p-wgZv_GBeZsV8AEWLgj8NOOcIkD-xPH--HlcwESe4v9HA3jW68NhXRU1I'; // Replace with your actual PayPal client ID
+$clientSecret = 'ENjXYuxvihqYfX7tWwt84K4OL1PAtJlz8N4Bp303H-MAhV8bTGXGg31YHZc6B-twIMxjt6UYEXU9-CHs'; // Replace with your actual PayPal client secret
+
+$environment = new SandboxEnvironment($clientId, $clientSecret);
+$client = new PayPalHttpClient($environment);
+
+function validateAppointment($appdate, $time) {
     $currentDate = date('Y-m-d');
     if ($appdate < $currentDate) {
-        $_SESSION['msg'] = 'You cannot book an appointment in the past. Please select a valid date.';
-        $_SESSION['msg_type'] = 'error';
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
+        return 'You cannot book an appointment in the past. Please select a valid date.';
     }
 
-    // Validate the appointment time based on the day of the week
     $dayOfWeek = date('N', strtotime($appdate)); // 1 (for Monday) through 7 (for Sunday)
     $appointmentTime = date("H:i", strtotime($time)); // Convert time to 24-hour format for comparison
 
@@ -40,8 +51,154 @@ if (isset($_POST['submit']) || isset($_POST['pay_online'])) {
 
     // Check if the selected time falls within the allowed range
     if (($dayOfWeek >= 1 && $dayOfWeek <= 5 && ($appointmentTime < $weekdayStart || $appointmentTime > $weekdayEnd)) ||
-        ($dayOfWeek == 6 || $dayOfWeek == 7) && ($appointmentTime < $weekendStart || $appointmentTime > $weekendEnd)) {
-        $_SESSION['msg'] = 'Invalid appointment time. Please select a time between 10:00 AM and 5:00 PM on weekdays, or 10:00 AM to 3:00 PM on weekends.';
+        ($dayOfWeek == 6 || $dayOfWeek == 7 && ($appointmentTime < $weekendStart || $appointmentTime > $weekendEnd))) {
+        return 'Invalid appointment time. Please select a time between 10:00 AM and 5:00 PM on weekdays, or 10:00 AM to 3:00 PM on weekends.';
+    }
+
+    return null;
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['paypal'])) {
+
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $_SESSION['msg'] = 'Invalid CSRF token.';
+        $_SESSION['msg_type'] = 'error';
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    }
+
+    $userid = $_SESSION['id'];
+    $specilization = htmlspecialchars(strip_tags($_POST['Doctorspecialization']));
+    $doctorid = htmlspecialchars(strip_tags($_POST['doctor']));
+    $fees = htmlspecialchars(strip_tags($_POST['fees']));
+    $appdate = htmlspecialchars(strip_tags($_POST['appdate']));
+    $time = htmlspecialchars(strip_tags($_POST['apptime']));
+    $userstatus = 1;
+    $docstatus = 1;
+
+    // Validate appointment date and time
+    $validationError = validateAppointment($appdate, $time);
+    if ($validationError) {
+        $_SESSION['msg'] = $validationError;
+        $_SESSION['msg_type'] = 'error';
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    }
+
+    // Set session variables
+    $_SESSION['Doctorspecialization'] = $specilization;
+    $_SESSION['doctor'] = $doctorid;
+    $_SESSION['fees'] = $fees;
+    $_SESSION['appdate'] = $appdate;
+    $_SESSION['apptime'] = $time;
+
+    $request = new OrdersCreateRequest();
+    $request->prefer('return=representation');
+    $request->body = [
+        "intent" => "CAPTURE",
+        "purchase_units" => [[
+            "amount" => [
+                "value" => $fees,
+                "currency_code" => "PHP"
+            ]
+        ]],
+        "application_context" => [
+            "cancel_url" => "http://localhost/dentacare/hms/book-appointment.php",
+            "return_url" => "http://localhost/dentacare/hms/book-appointment.php?success=true"
+        ]
+    ];
+
+    try {
+        $response = $client->execute($request);
+        foreach ($response->result->links as $link) {
+            if ($link->rel == 'approve') {
+                header("Location: " . $link->href);
+                exit();
+            }
+        }
+    } catch (Exception $ex) {
+        $_SESSION['msg'] = "Error processing payment: " . $ex->getMessage();
+        $_SESSION['msg_type'] = "error";
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    }
+}
+
+if (isset($_GET['success']) && $_GET['success'] == 'true' && isset($_GET['token'])) {
+    $token = $_GET['token'];
+
+    $request = new OrdersCaptureRequest($token);
+    $request->prefer('return=representation');
+
+    try {
+        $response = $client->execute($request);
+
+        if ($response->result->status == 'COMPLETED') {
+            if (isset($_SESSION['id'], $_SESSION['Doctorspecialization'], $_SESSION['doctor'], $_SESSION['fees'], $_SESSION['appdate'], $_SESSION['apptime'])) {
+                $userid = $_SESSION['id'];
+                $specilization = $_SESSION['Doctorspecialization'];
+                $doctorid = $_SESSION['doctor'];
+                $fees = $_SESSION['fees'];
+                $appdate = $_SESSION['appdate'];
+                $time = $_SESSION['apptime'];
+                $userstatus = 1;
+                $docstatus = 1;
+                $payment_method = 'Online';
+
+                // Insert payment details into DB
+                $stmt = $con->prepare("INSERT INTO payments (user_id, amount, transaction_id, status) VALUES (?, ?, ?, ?)");
+                $stmt->bind_param("idss", $userid, $fees, $response->result->id, $response->result->status);
+                $stmt->execute();
+                $stmt->close();
+
+                // Insert appointment details
+                $stmt = $con->prepare("INSERT INTO appointment (doctorSpecialization, doctorId, userId, consultancyFees, appointmentDate, appointmentTime, userStatus, doctorStatus, payment_method) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("sssssssss", $specilization, $doctorid, $userid, $fees, $appdate, $time, $userstatus, $docstatus, $payment_method);
+                $stmt->execute();
+                $stmt->close();
+
+                $_SESSION['msg'] = "Payment and appointment booking successful!";
+                $_SESSION['msg_type'] = "success";
+            } else {
+                $_SESSION['msg'] = "Session variables not set.";
+                $_SESSION['msg_type'] = "error";
+            }
+        } else {
+            $_SESSION['msg'] = "Payment failed. Please try again.";
+            $_SESSION['msg_type'] = "error";
+        }
+    } catch (Exception $ex) {
+        $_SESSION['msg'] = "Error processing payment: " . $ex->getMessage();
+        $_SESSION['msg_type'] = "error";
+    }
+}
+
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'user') {
+    header("Location: error.php");
+    exit();
+}
+
+if (isset($_POST['submit'])) {
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $_SESSION['msg'] = 'Invalid CSRF token.';
+        $_SESSION['msg_type'] = 'error';
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    }
+    $specilization = htmlspecialchars(strip_tags($_POST['Doctorspecialization']));
+    $doctorid = htmlspecialchars(strip_tags($_POST['doctor']));
+    $userid = $_SESSION['id'];
+    $fees = htmlspecialchars(strip_tags($_POST['fees']));
+    $appdate = htmlspecialchars(strip_tags($_POST['appdate']));
+    $time = htmlspecialchars(strip_tags($_POST['apptime']));
+    $userstatus = 1;
+    $docstatus = 1;
+    $payment_method = 'Cash';
+
+    // Validate appointment date and time
+    $validationError = validateAppointment($appdate, $time);
+    if ($validationError) {
+        $_SESSION['msg'] = $validationError;
         $_SESSION['msg_type'] = 'error';
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
@@ -59,35 +216,20 @@ if (isset($_POST['submit']) || isset($_POST['pay_online'])) {
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     } else {
-        if (isset($_POST['pay_online'])) {
-            $_SESSION['appointment_data'] = [
-                'doctorSpecialization' => $specilization,
-                'doctorId' => $doctorid,
-                'userId' => $userid,
-                'consultancyFees' => $fees,
-                'appointmentDate' => $appdate,
-                'appointmentTime' => $time,
-                'userStatus' => $userstatus,
-                'doctorStatus' => $docstatus
-            ];
-            header("Location: pay_fee.php");
-            exit();
+        $stmt = $con->prepare("INSERT INTO appointment (doctorSpecialization, doctorId, userId, consultancyFees, appointmentDate, appointmentTime, userStatus, doctorStatus, payment_method) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssssss", $specilization, $doctorid, $userid, $fees, $appdate, $time, $userstatus, $docstatus, $payment_method);
+
+        if ($stmt->execute()) {
+            $_SESSION['msg'] = 'Your appointment has been successfully booked.';
+            $_SESSION['msg_type'] = 'success';
         } else {
-            $stmt = $con->prepare("INSERT INTO appointment (doctorSpecialization, doctorId, userId, consultancyFees, appointmentDate, appointmentTime, userStatus, doctorStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssssss", $specilization, $doctorid, $userid, $fees, $appdate, $time, $userstatus, $docstatus);
-
-            if ($stmt->execute()) {
-                $_SESSION['msg'] = 'Your appointment has been successfully booked.';
-                $_SESSION['msg_type'] = 'success';
-            } else {
-                $_SESSION['msg'] = 'Error booking appointment: ' . $stmt->error;
-                $_SESSION['msg_type'] = 'error';
-            }
-
-            $stmt->close();
-            header("Location: " . $_SERVER['PHP_SELF']);
-            exit();
+            $_SESSION['msg'] = 'Error booking appointment: ' . $stmt->error;
+            $_SESSION['msg_type'] = 'error';
         }
+
+        $stmt->close();
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
     }
 }
 ?>
@@ -111,10 +253,10 @@ if (isset($_POST['submit']) || isset($_POST['pay_online'])) {
     <link rel="stylesheet" href="assets/css/themes/theme-1.css" id="skin_color">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://checkout.stripe.com/checkout.js"></script>
 </head>
 <body>
-<div id="app">        <?php include('include/footer.php');?>
+<div id="app">        
+    <?php include('include/footer.php');?>
     <?php include('include/sidebar.php');?>
     <div class="app-content">
         <?php include('include/header.php');?>
@@ -142,6 +284,7 @@ if (isset($_POST['submit']) || isset($_POST['pay_online'])) {
                                         </div>
                                         <div class="panel-body">
                                             <form role="form" name="book" method="post" id="appointmentForm">
+                                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                                                 <div class="form-group">
                                                     <label for="DoctorSpecialization">Doctor Specialization</label>
                                                     <select name="Doctorspecialization" class="form-control" onChange="getdoctor(this.value);" required="required">
@@ -174,10 +317,11 @@ if (isset($_POST['submit']) || isset($_POST['pay_online'])) {
 
                                                 <div class="form-group">
                                                     <label for="Appointmenttime">Time</label>
-                                                    <input class="form-control timepicker" name="apptime" id="timepicker1" required="required" placeholder="eg: 10:00 PM">
+                                                    <input class="form-control timepicker" name="apptime" id="timepicker1" required="required" placeholder="eg: 10:00 AM">
                                                 </div>
 
-                                                <button type="button" id="payButton" class="btn btn-o btn-primary">Proceed to Pay</button>
+                                                <input type="hidden" name="pay_online" value="1">
+                                                <button type="submit" name="paypal" class="btn btn-o btn-primary">Proceed to Pay with PayPal</button>
                                                 <button type="submit" name="submit" class="btn btn-o btn-secondary">Book without Payment</button>
                                             </form>
                                         </div>
@@ -193,52 +337,7 @@ if (isset($_POST['submit']) || isset($_POST['pay_online'])) {
     </div>
 </div>
 
-<script>
-    document.getElementById('payButton').addEventListener('click', function(e) {
-        var handler = StripeCheckout.configure({
-            key: 'pk_test_51QG2QFLwfEoMpz35Dnxr0pzi4u8S4FuYmcNPnIBcfXsm1RkZGv5i8jHvLPp7jR0UVxRTkjkSqho3cUz5WtPVhl2B00mX4vJt68', // Replace with your Stripe public key
-            image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
-            locale: 'auto',
-            token: function(token) {
-                // Insert the token into the form
-                var form = document.getElementById('appointmentForm');
-                var hiddenInput = document.createElement('input');
-                hiddenInput.setAttribute('type', 'hidden');
-                hiddenInput.setAttribute('name', 'stripeToken');
-                hiddenInput.setAttribute('value', token.id);
-                form.appendChild(hiddenInput);
-
-                // Add a hidden input for the total amount
-                var fees = document.getElementById('fees').value;
-                var hiddenAmountInput = document.createElement('input');
-                hiddenAmountInput.setAttribute('type', 'hidden');
-                hiddenAmountInput.setAttribute('name', 'total');
-                hiddenAmountInput.setAttribute('value', fees * 100); // Convert to cents
-                form.appendChild(hiddenAmountInput);
-
-                // Submit the form
-                form.submit();
-            }
-        });
-
-        // Open the Stripe Checkout with default options
-        handler.open({
-            name: 'DentaCare',
-            description: 'Full Payment',
-            amount: document.getElementById('fees').value * 100, // Convert to cents
-            currency: 'php',
-            email: 'dentacare112@gmi'
-        });
-        e.preventDefault();
-    });
-
-    window.addEventListener('popstate', function() {
-        handler.close();
-    });
-</script>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://checkout.stripe.com/checkout.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
 <script src="vendor/modernizr/modernizr.js"></script>
 <script src="vendor/jquery-cookie/jquery.cookie.js"></script>
@@ -258,8 +357,13 @@ if (isset($_POST['submit']) || isset($_POST['pay_online'])) {
 <script>
     jQuery(document).ready(function() {
         Main.init();
-        $('.datepicker').datepicker();
-        $('.timepicker').timepicker();
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd'
+        });
+        $('.timepicker').timepicker({
+            showMeridian: true,
+            defaultTime: 'current'
+        });
     });
 
     function getdoctor(val) {

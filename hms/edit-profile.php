@@ -1,5 +1,11 @@
 <?php
-session_start();
+session_start([
+    'cookie_lifetime' => 86400,
+    'cookie_secure' => true,
+    'cookie_httponly' => true,
+    'cookie_samesite' => 'Strict',
+]);
+
 include('include/config.php');
 include('include/checklogin.php');
 $target_dir = "uploads/"; 
@@ -10,14 +16,33 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'user') {
     exit();
 }
 
+// Secure error handling
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', '/var/log/app_errors.log');
+
+define("ENCRYPTION_KEY", base64_decode("your-base64-encoded-32-byte-key")); // 32 bytes for AES-256
+define("ENCRYPTION_IV", substr(base64_decode("your-base64-encoded-16-byte-iv"), 0, 16)); // Ensure 16 bytes
+
+function encryptData($data) {
+    return base64_encode(openssl_encrypt($data, 'aes-256-cbc', ENCRYPTION_KEY, 0, ENCRYPTION_IV));
+}
+
+function decryptData($encryptedData) {
+    return openssl_decrypt(base64_decode($encryptedData), 'aes-256-cbc', ENCRYPTION_KEY, 0, ENCRYPTION_IV);
+}
+
+// CSRF Protection
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Initialize message variable
 $msg = "";
 
 // Handle profile picture upload
-// Handle profile picture upload
 if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
-    $$target_dir = "uploads/"; // Ensure this directory exists and is writable
-
+    $target_dir = "uploads/"; // Ensure this directory exists and is writable
     $target_file = $target_dir . basename($_FILES["profile_picture"]["name"]);
 
     // Check if the uploads directory is writable
@@ -25,44 +50,61 @@ if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 
         die("The uploads directory is not writable.");
     }
 
-    // Check if the file is an actual image
-    $check = getimagesize($_FILES["profile_picture"]["tmp_name"]);
-    if ($check !== false) {
-        // Move the uploaded file
-        if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
-            // Update the user's profile picture path in the database
-            $sql = mysqli_query($con, "UPDATE users SET profile_picture='$target_file' WHERE id='" . $_SESSION['id'] . "'");
-            if ($sql) {
-                $msg = "Profile picture updated successfully.";
-                $_SESSION['profile_picture'] = $target_file; // Update session variable
-            } else {
-                $msg = "Error updating profile picture.";
-            }
+    // Validate file type and extension
+    $allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif'];
+    $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+
+    $file_mime_type = mime_content_type($_FILES['profile_picture']['tmp_name']);
+    $file_extension = pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
+
+    if (!in_array($file_mime_type, $allowed_mime_types) || !in_array($file_extension, $allowed_extensions)) {
+        die('Invalid file type');
+    }
+
+    // Move the uploaded file securely
+    if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
+        $sql = mysqli_prepare($con, "UPDATE users SET profile_picture=? WHERE id=?");
+        $profile_picture = basename($target_file);
+        $user_id = $_SESSION['id'];
+        mysqli_stmt_bind_param($sql, 'si', $profile_picture, $user_id);
+        $queryResult = mysqli_stmt_execute($sql);
+        mysqli_stmt_close($sql);
+
+        if ($queryResult) {
+            $msg = "Profile picture updated successfully.";
+            $_SESSION['profile_picture'] = $target_file; // Update session variable
         } else {
-            $msg = "Error uploading file.";
+            $msg = "Error updating profile picture.";
         }
     } else {
-        $msg = "File is not an image.";
+        $msg = "Error uploading file.";
     }
 }
 
 
 // Handle profile information update
 if (isset($_POST['submit'])) {
-    $fname = $_POST['fname'];
-    $address = $_POST['address'];
-    $city = $_POST['city'];
-    $gender = $_POST['gender'];
-    // Use the uploaded picture if present
+    // CSRF token validation
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        die('Invalid CSRF token');
+    }
+
+    $fname = htmlspecialchars(strip_tags($_POST['fname']));
+    $address = encryptData(htmlspecialchars(strip_tags($_POST['address'])));
+    $city = encryptData(htmlspecialchars(strip_tags($_POST['city'])));
+    $province = encryptData(htmlspecialchars(strip_tags($_POST['province'])));
+    $gender = htmlspecialchars(strip_tags($_POST['gender']));
     $profilepic = $_SESSION['profile_picture'] ?? null; // Default to current picture
 
-    // Update user information in the database
-    $sql = mysqli_query($con, "UPDATE users SET fullName='$fname', address='$address', city='$city', gender='$gender', profile_picture='$profilepic' WHERE id='" . $_SESSION['id'] . "'");
-    if ($sql) {
+    $stmt = mysqli_prepare($con, "UPDATE users SET fullName=?, address=?, city=?, province=?, gender=?, profile_picture=? WHERE id=?");
+    mysqli_stmt_bind_param($stmt, 'ssssssi', $fname, $address, $city, $province, $gender, $profilepic, $_SESSION['id']);
+    if (mysqli_stmt_execute($stmt)) {
         $msg = "Your Profile updated Successfully";
     }
+    mysqli_stmt_close($stmt);
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -81,11 +123,12 @@ if (isset($_POST['submit'])) {
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/plugins.css">
     <link rel="stylesheet" href="assets/css/themes/theme-1.css" id="skin_color" />
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <div id="app">   <?php include('include/footer.php');?>     
+    <div id="app">   
+        <?php include('include/footer.php');?>     
         <?php include('include/sidebar.php');?>
         <div class="app-content">
             <?php include('include/header.php');?>
@@ -124,6 +167,9 @@ if (isset($_POST['submit'])) {
                                                 <?php 
                                                 $sql = mysqli_query($con, "SELECT * FROM users WHERE id='" . $_SESSION['id'] . "'");
                                                 while ($data = mysqli_fetch_array($sql)) {
+                                                    $decrypted_address = decryptData($data['address']);
+                                                    $decrypted_city = decryptData($data['city']);
+                                                    $decrypted_province = decryptData($data['province']);
                                                 ?>
                                                 <h4><?php echo htmlentities($data['fullName']);?>'s Profile</h4>
                                                 <p><b>Profile Reg. Date: </b><?php echo htmlentities($data['regDate']);?></p>
@@ -132,9 +178,10 @@ if (isset($_POST['submit'])) {
                                                 <?php } ?>
                                                 <hr />
                                                 <form role="form" name="edit" method="post" enctype="multipart/form-data">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                                                     <div class="form-group">
                                                         <label for="fname">User Name</label>
-                                                        <input type="text" name="fname" class="form-control" value="<?php echo htmlentities($data['fullName']);?>">
+                                                        <input type="text" name="fname" class="form-control" value="<?php echo htmlentities($data['fullName']);?>" maxlength="255">
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="profile_picture">Profile Picture</label>
@@ -142,19 +189,23 @@ if (isset($_POST['submit'])) {
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="address">Address</label>
-                                                        <textarea name="address" class="form-control"><?php echo htmlentities($data['address']);?></textarea>
+                                                        <textarea name="address" class="form-control" maxlength="255"><?php echo htmlentities($decrypted_address);?></textarea>
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="city">City</label>
-                                                        <input type="text" name="city" class="form-control" required="required" value="<?php echo htmlentities($data['city']);?>">
+                                                        <input type="text" name="city" class="form-control" required="required" value="<?php echo htmlentities($decrypted_city);?>" maxlength="255">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="province">Province</label>
+                                                        <input type="text" name="province" class="form-control" required="required" value="<?php echo htmlentities($decrypted_province);?>" maxlength="255">
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="gender">Gender</label>
                                                         <select name="gender" class="form-control" required="required">
                                                             <option value="<?php echo htmlentities($data['gender']);?>"><?php echo htmlentities($data['gender']);?></option>
-                                                            <option value="male">Male</option>	
-                                                            <option value="female">Female</option>	
-                                                            <option value="other">Other</option>	
+                                                            <option value="male">Male</option>    
+                                                            <option value="female">Female</option>    
+                                                            <option value="other">Other</option>    
                                                         </select>
                                                     </div>
                                                     <div class="form-group">
@@ -174,7 +225,7 @@ if (isset($_POST['submit'])) {
                     </div>
                 </div>
             </div>
-            <?php include('include/footer.php');?>
+            
             <?php include('include/setting.php');?>
         </div>
         <script src="vendor/jquery/jquery.min.js"></script>
@@ -199,7 +250,7 @@ if (isset($_POST['submit'])) {
                 FormElements.init();
             });
         </script>
-		  <script>
+          <script>
             $(document).ready(function() {
                 // Check if there is a message to display
                 var msg = "<?php echo $msg; ?>";

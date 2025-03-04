@@ -1,3 +1,21 @@
+<?php
+session_start([
+    'cookie_lifetime' => 86400,
+    'cookie_secure' => true,
+    'cookie_httponly' => true,
+    'cookie_samesite' => 'Strict',
+]);
+
+// Log unauthorized access attempts
+error_log('Unauthorized access attempt from IP: ' . $_SERVER['REMOTE_ADDR'] . ' on ' . date('Y-m-d H:i:s'));
+
+// Ensure error display is disabled in production
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+ini_set('error_log', '/var/log/app_errors.log'); // Ensure this path is correct and writable
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

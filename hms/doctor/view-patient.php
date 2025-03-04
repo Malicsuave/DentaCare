@@ -105,7 +105,7 @@ if (isset($_POST["btnUpload"])) {
                     <section id="page-title">
                         <div class="row">
                             <div class="col-sm-8">
-                                <h1 class="mainTitle">Users | Medical History Upload</h1>
+                                <h1 class="mainTitle">Doctor | Medical History Upload</h1>
                             </div>
                             <ol class="breadcrumb">
                                 <li><span>Users</span></li>

@@ -31,10 +31,12 @@
         <?php
         // Get the user's profile picture
         $query = mysqli_query($con, "SELECT fullName, profile_picture FROM users WHERE id='" . $_SESSION['id'] . "'");
-        $row = mysqli_fetch_array($query);
-        $profilePicture = !empty($row['profile_picture']) ? $row['profile_picture'] : 'assets/images/default.jpg'; // Fallback image
+$row = mysqli_fetch_array($query);
+$_SESSION['profile_picture'] = $row['profile_picture']; // Update session
+$profilePicture = !empty($_SESSION['profile_picture']) ? $_SESSION['profile_picture'] : 'assets/images/default-user.png';
+
         ?>
-        <img src="<?php echo $profilePicture; ?>" style="width:40px; height:40px;"> <span class="username">
+       <img src="<?php echo $profilePicture . '?' . time(); ?>" style="width:40px; height:40px;">
             <?php echo $row['fullName']; ?> <i class="ti-angle-down"></i></span>
     </a>
     <ul class="dropdown-menu dropdown-dark">
