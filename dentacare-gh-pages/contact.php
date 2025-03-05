@@ -1,18 +1,29 @@
 <?php
+session_start();
 include_once('../hms/include/config.php');
 
 $successMessage = false; // Initialize a flag for success
 
+// Generate a CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 if (isset($_POST['submit'])) {
-    $name = $_POST['fullname'];
-    $email = $_POST['emailid'];
-    $mobileno = $_POST['mobileno'];
-    $dscrption = $_POST['description'];
+    if (hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $name = $_POST['fullname'];
+        $email = $_POST['emailid'];
+        $mobileno = $_POST['mobileno'];
+        $dscrption = $_POST['description'];
 
-    $query = mysqli_query($con, "INSERT INTO tblcontactus(fullname,email,contactno,message) VALUE('$name','$email','$mobileno','$dscrption')");
+        $query = mysqli_query($con, "INSERT INTO tblcontactus(fullname,email,contactno,message) VALUE('$name','$email','$mobileno','$dscrption')");
 
-    if ($query) {
-        $successMessage = true; // Set flag to true if submission is successful
+        if ($query) {
+            $successMessage = true; // Set flag to true if submission is successful
+        }
+    } else {
+        // Invalid CSRF token
+        die('Invalid CSRF token');
     }
 }
 ?>
@@ -130,7 +141,7 @@ if (isset($_POST['submit'])) {
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 </body>
     <!-- END nav -->
 
@@ -152,23 +163,24 @@ if (isset($_POST['submit'])) {
         <div class="container">
             <div class="row block-9">
                 <div class="col-md-6 pr-md-5">
-                    <form method="POST" action="contact.php">
-                        <div class="form-group">
-                            <input type="text" class="form-control" name="fullname" required placeholder="Your Name">
-                        </div>
-                        <div class="form-group">
-                            <input type="email" class="form-control" name="emailid" required placeholder="Your Email">
-                        </div>
-                        <div class="form-group">
-    <input type="text" class="form-control" name="mobileno" required="true" maxlength="11" placeholder="Mobile Number" oninput="limitInput(this)">
-</div>
-                        <div class="form-group">
-                            <textarea class="form-control" name="description" required placeholder="Message" cols="30" rows="7"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" name="submit" class="btn btn-primary py-3 px-5">Send Message</button>
-                        </div>
-                    </form>
+                   <form method="POST" action="contact.php">
+    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+    <div class="form-group">
+        <input type="text" class="form-control" name="fullname" required placeholder="Your Name">
+    </div>
+    <div class="form-group">
+        <input type="email" class="form-control" name="emailid" required placeholder="Your Email">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" name="mobileno" required="true" maxlength="11" placeholder="Mobile Number" oninput="limitInput(this)">
+    </div>
+    <div class="form-group">
+        <textarea class="form-control" name="description" required placeholder="Message" cols="30" rows="7"></textarea>
+    </div>
+    <div class="form-group">
+        <button type="submit" name="submit" class="btn btn-primary py-3 px-5">Send Message</button>
+    </div>
+</form>
                 </div>
             </div>
         </div>

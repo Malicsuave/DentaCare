@@ -130,8 +130,9 @@ if (empty($_SESSION['csrf_token'])) {
             <!-- end: SETTINGS -->
         </div>
         <!-- start: MAIN JAVASCRIPTS -->
-        <script src="vendor/jquery/jquery.min.js"></script>
         <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+        <script src="vendor/jquery/jquery.min.js"></script>
+        
         <script src="vendor/modernizr/modernizr.js"></script>
         <script src="vendor/jquery-cookie/jquery.cookie.js"></script>
         <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>

@@ -1,5 +1,10 @@
 <?php
-session_start();
+session_start([
+    'cookie_lifetime' => 86400,
+    'cookie_secure' => true,
+    'cookie_httponly' => true,
+    'cookie_samesite' => 'Strict',
+]);
 
 error_reporting(0);
 include('include/config.php');
@@ -10,8 +15,18 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
+// CSRF Protection
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 if (isset($_GET['cancel'])) {
-    $appointmentId = $_GET['id'];
+    // CSRF token validation
+    if (!hash_equals($_SESSION['csrf_token'], $_GET['csrf_token'])) {
+        die('Invalid CSRF token');
+    }
+
+    $appointmentId = intval($_GET['id']);
     $query = mysqli_prepare($con, "UPDATE appointment SET doctorStatus=0 WHERE id=?");
     mysqli_stmt_bind_param($query, "i", $appointmentId);
     mysqli_stmt_execute($query);
@@ -71,8 +86,10 @@ if (isset($_GET['cancel'])) {
                     <div class="container-fluid container-fullw bg-white">
                         <div class="row">
                             <div class="col-md-12">
-                                <p style="color:red;"><?php echo htmlentities($_SESSION['msg']);?>
-                                <?php echo htmlentities($_SESSION['msg']="");?></p>    
+                            <?php if (isset($_SESSION['msg']) && $_SESSION['msg'] != ""): ?>
+    <p style="color:red;"><?php echo htmlentities($_SESSION['msg']); ?></p>
+    <?php unset($_SESSION['msg']); ?>
+<?php endif; ?>
                                 <table class="table table-hover" id="sample-table-1">
                                     <thead>
                                         <tr>
@@ -89,19 +106,20 @@ if (isset($_GET['cancel'])) {
                                     </thead>
                                     <tbody>
 <?php
-$sql=mysqli_query($con,"select doctors.doctorName as docname,users.fullName as pname,appointment.*  from appointment join doctors on doctors.id=appointment.doctorId join users on users.id=appointment.userId ");
-$cnt=1;
-while($row=mysqli_fetch_array($sql))
-{
+$sql = mysqli_prepare($con, "SELECT doctors.doctorName as docname, users.fullName as pname, appointment.* FROM appointment JOIN doctors ON doctors.id=appointment.doctorId JOIN users ON users.id=appointment.userId");
+mysqli_stmt_execute($sql);
+$result = mysqli_stmt_get_result($sql);;
+$cnt = 1;
+while ($row = mysqli_fetch_array($result)) {
 ?>
                                         <tr>
                                             <td class="center"><?php echo $cnt;?>.</td>
-                                            <td class="hidden-xs"><?php echo $row['docname'];?></td>
-                                            <td class="hidden-xs"><?php echo $row['pname'];?></td>
-                                            <td><?php echo $row['doctorSpecialization'];?></td>
-                                            <td><?php echo $row['consultancyFees'];?></td>
-                                            <td><?php echo $row['appointmentDate'];?> / <?php echo $row['appointmentTime'];?></td>
-                                            <td><?php echo $row['postingDate'];?></td>
+                                            <td class="hidden-xs"><?php echo htmlentities($row['docname']);?></td>
+                                            <td class="hidden-xs"><?php echo htmlentities($row['pname']);?></td>
+                                            <td><?php echo htmlentities($row['doctorSpecialization']);?></td>
+                                            <td><?php echo htmlentities($row['consultancyFees']);?></td>
+                                            <td><?php echo htmlentities($row['appointmentDate']);?> / <?php echo htmlentities($row['appointmentTime']);?></td>
+                                            <td><?php echo htmlentities($row['postingDate']);?></td>
                                             <td>
 <?php if(($row['userStatus']==1) && ($row['doctorStatus']==1))  
 {
@@ -122,7 +140,7 @@ if(($row['userStatus']==1) && ($row['doctorStatus']==0))
                                                 <div class="visible-md visible-lg hidden-sm hidden-xs">
 <?php if(($row['userStatus']==1) && ($row['doctorStatus']==1))  
 { 
-    echo '<a href="appointment-history.php?id='.$row['id'].'&cancel=update" class="btn btn-transparent btn-xs tooltips" tooltip-placement="top" tooltip="Cancel Appointment">Cancel</a>';
+    echo '<a href="appointment-history.php?id='.htmlentities($row['id']).'&cancel=update&csrf_token='.$_SESSION['csrf_token'].'" class="btn btn-transparent btn-xs tooltips" tooltip-placement="top" tooltip="Cancel Appointment">Cancel</a>';
 } else {
     echo "Canceled";
 } ?>
@@ -155,7 +173,9 @@ if(($row['userStatus']==1) && ($row['doctorStatus']==0))
                                         </tr>
 <?php 
 $cnt=$cnt+1;
-}?>
+}
+mysqli_stmt_close($sql);
+?>
                                     </tbody>
                                 </table>
                             </div>

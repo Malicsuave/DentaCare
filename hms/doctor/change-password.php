@@ -4,6 +4,7 @@ include('include/config.php');
 include('include/checklogin.php');
 check_login();
 
+// Authentication and Session Management
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'doctor') {
     header("Location: error.php"); // Redirect to an error page or home page
     exit();
@@ -13,10 +14,27 @@ date_default_timezone_set('Asia/Kolkata'); // change according to timezone
 $currentTime = date('d-m-Y h:i:s A', time());
 
 if (isset($_POST['submit'])) {
-    $sql = mysqli_query($con, "SELECT password FROM doctors WHERE password='" . md5($_POST['cpass']) . "' AND id='" . $_SESSION['id'] . "'");
+    $cpass = htmlspecialchars(trim($_POST['cpass']));
+    $npass = htmlspecialchars(trim($_POST['npass']));
+    $cfpass = htmlspecialchars(trim($_POST['cfpass']));
+
+    // Input Validation and Data Sanitation
+    if (empty($cpass) || empty($npass) || empty($cfpass)) {
+        $_SESSION['msg1'] = "All fields are required!";
+        header("Location: change-password.php?status=error"); // Redirect with error status
+        exit();
+    }
+
+    if ($npass !== $cfpass) {
+        $_SESSION['msg1'] = "New Password and Confirm Password do not match!";
+        header("Location: change-password.php?status=error"); // Redirect with error status
+        exit();
+    }
+
+    $sql = mysqli_query($con, "SELECT password FROM doctors WHERE password='" . md5($cpass) . "' AND id='" . $_SESSION['id'] . "'");
     $num = mysqli_fetch_array($sql);
     if ($num > 0) {
-        mysqli_query($con, "UPDATE doctors SET password='" . md5($_POST['npass']) . "', updationDate='$currentTime' WHERE id='" . $_SESSION['id'] . "'");
+        mysqli_query($con, "UPDATE doctors SET password='" . md5($npass) . "', updationDate='$currentTime' WHERE id='" . $_SESSION['id'] . "'");
         $_SESSION['msg1'] = "Password Changed Successfully !!";
         header("Location: change-password.php?status=success"); // Redirect with success status
         exit();

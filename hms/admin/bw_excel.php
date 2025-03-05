@@ -1,9 +1,16 @@
 <?php
 session_start();
 include('include/config.php');
+
+// Authentication and Session Management
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: error.php"); // Redirect to an error page or home page
     exit();
+}
+
+// Input validation and data sanitation
+function sanitize_input($data) {
+    return htmlspecialchars(strip_tags(trim($data)));
 }
 
 // Set headers for Excel file
@@ -11,11 +18,15 @@ header("Content-Type: application/vnd.ms-excel");
 header("Content-Disposition: attachment; filename=patients_report.xls");
 
 // Fetch data from the tblpatient table
-$fdate = $_POST['fromdate']; // Assuming these values are being passed via a form
-$tdate = $_POST['todate'];
+$fdate = sanitize_input($_POST['fromdate']);
+$tdate = sanitize_input($_POST['todate']);
 
-$sql = mysqli_query($con, "SELECT * FROM tblpatient WHERE date(CreationDate) BETWEEN '$fdate' AND '$tdate'"); // Adjust query as needed
-if (!$sql) {
+$sql = mysqli_prepare($con, "SELECT * FROM tblpatient WHERE date(CreationDate) BETWEEN ? AND ?");
+mysqli_stmt_bind_param($sql, 'ss', $fdate, $tdate);
+mysqli_stmt_execute($sql);
+$result = mysqli_stmt_get_result($sql);
+
+if (!$result) {
     die('Query Failed: ' . mysqli_error($con));
 }
 
@@ -35,10 +46,10 @@ echo '<tbody>';
 
 // Output the data rows
 $cnt = 1;
-while ($row = mysqli_fetch_array($sql)) {
+while ($row = mysqli_fetch_array($result)) {
     echo '<tr>';
     echo '<td>' . $cnt . '</td>';
-    echo '<td>' . htmlentities($row['PatientName']) . '</td>'; // Adjust this if the Patient Name column name differs
+    echo '<td>' . htmlentities($row['PatientName']) . '</td>';
     echo '<td>' . htmlentities($row['PatientContno']) . '</td>';
     echo '<td>' . htmlentities($row['PatientGender']) . '</td>';
     echo '<td>' . htmlentities($row['CreationDate']) . '</td>';

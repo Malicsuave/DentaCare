@@ -1,13 +1,31 @@
 <?php
 session_start();
-error_reporting(0);
+error_reporting(0); // Disable error display in production
 include('include/config.php');
 include('include/checklogin.php');
-
 check_login();
+
+// Ensure the user has the correct role
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: error.php"); // Redirect to an error page or home page
+    // Log the unauthorized access attempt
+    error_log("Unauthorized access attempt by user with role: " . $_SESSION['role'], 3, "/var/log/app_errors.log");
+
+    // Redirect to a custom error page instead of exposing system details
+    header("Location: error.php");
     exit();
+}
+
+// Regenerate session ID to prevent session fixation
+session_regenerate_id(true);
+
+// Set secure cookie parameters
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_samesite', 'Strict');
+
+// Generate CSRF token if not already set
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 ?>
 <!DOCTYPE html>

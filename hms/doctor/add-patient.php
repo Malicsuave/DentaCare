@@ -5,6 +5,7 @@ include('include/config.php');
 include('include/checklogin.php');
 check_login();
 
+// Authentication and Session Management
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'doctor') {
     header("Location: error.php"); // Redirect to an error page or home page
     exit();
@@ -12,15 +13,15 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'doctor') {
 
 if (isset($_POST['submit'])) {
     $docid = $_SESSION['id'];
-    $patname = $_POST['patname'];
-    $patcontact = $_POST['patcontact'];
-    $patemail = $_POST['patemail'];
-    $gender = $_POST['gender'];
-    $pataddress = $_POST['pataddress'];
-    $patage = $_POST['patage'];
-    $medhis = $_POST['medhis'];
+    $patname = htmlspecialchars(trim($_POST['patname']));
+    $patcontact = htmlspecialchars(trim($_POST['patcontact']));
+    $patemail = htmlspecialchars(trim($_POST['patemail']));
+    $gender = htmlspecialchars(trim($_POST['gender']));
+    $pataddress = htmlspecialchars(trim($_POST['pataddress']));
+    $patage = htmlspecialchars(trim($_POST['patage']));
+    $medhis = htmlspecialchars(trim($_POST['medhis']));
 
-    // Validate email format
+    // Input Validation and Data Sanitation
     if (!filter_var($patemail, FILTER_VALIDATE_EMAIL)) {
         $_SESSION['msg'] = "Invalid email format. Please enter a valid email address.";
         echo "<script>
@@ -36,9 +37,11 @@ if (isset($_POST['submit'])) {
         exit();
     }
 
-    $sql = mysqli_query($con, "INSERT INTO tblpatient(Docid, PatientName, PatientContno, PatientEmail, PatientGender, PatientAdd, PatientAge, PatientMedhis) VALUES('$docid', '$patname', '$patcontact', '$patemail', '$gender', '$pataddress', '$patage', '$medhis')");
+    // Secure Data Storage & Encryption
+    $stmt = $con->prepare("INSERT INTO tblpatient (Docid, PatientName, PatientContno, PatientEmail, PatientGender, PatientAdd, PatientAge, PatientMedhis) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("isssssis", $docid, $patname, $patcontact, $patemail, $gender, $pataddress, $patage, $medhis);
 
-    if ($sql) {
+    if ($stmt->execute()) {
         $_SESSION['msg'] = "Patient info added successfully!";
         echo "<script>
             window.onload = function() {
@@ -55,6 +58,8 @@ if (isset($_POST['submit'])) {
             }
         </script>";
     } else {
+        // Error Handling & Logging
+        error_log("Error in adding patient info: " . $stmt->error);
         $_SESSION['msg'] = "Error in adding patient info. Please try again.";
         echo "<script>
             window.onload = function() {
@@ -67,6 +72,7 @@ if (isset($_POST['submit'])) {
             }
         </script>";
     }
+    $stmt->close();
 }
 ?>
 <!DOCTYPE html>
@@ -88,6 +94,7 @@ if (isset($_POST['submit'])) {
     <link rel="stylesheet" href="assets/css/plugins.css">
     <link rel="stylesheet" href="assets/css/themes/theme-1.css" id="skin_color" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Include SweetAlert JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>

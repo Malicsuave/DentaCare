@@ -1,7 +1,7 @@
 <?php
 session_start();
 ob_start();
-//error_reporting(0);
+error_reporting(0);
 include('include/config.php');
 include('include/checklogin.php');
 

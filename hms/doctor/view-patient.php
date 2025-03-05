@@ -1,19 +1,24 @@
 <?php
-
+session_start();
 error_reporting(E_ALL); // Show all errors for debugging
 include('include/config.php');
 include('include/checklogin.php');
 check_login();
 
+// Input validation and data sanitation
+function sanitize_input($data) {
+    return htmlspecialchars(strip_tags(trim($data)));
+}
+
 if (isset($_POST['submit'])) {
-    $vid = $_GET['viewid'];
-    $bp = $_POST['bp'];
-    $bs = $_POST['bs'];
-    $weight = $_POST['weight'];
-    $temp = $_POST['temp'];
-    $pres = $_POST['pres'];
-    $chronic = $_POST['chronic'];
-    $prev = $_POST['previous'];
+    $vid = sanitize_input($_GET['viewid']);
+    $bp = sanitize_input($_POST['bp']);
+    $bs = sanitize_input($_POST['bs']);
+    $weight = sanitize_input($_POST['weight']);
+    $temp = sanitize_input($_POST['temp']);
+    $pres = sanitize_input($_POST['pres']);
+    $chronic = sanitize_input($_POST['chronic']);
+    $prev = sanitize_input($_POST['previous']);
 
     $query = mysqli_query($con, "INSERT INTO tblmedicalhistory (PatientID, BloodPressure, BloodSugar, Weight, Temperature, MedicalPres, ChronicCond, PrevDen) VALUES ('$vid', '$bp', '$bs', '$weight', '$temp', '$pres', '$chronic', '$prev')");
 
@@ -29,7 +34,7 @@ if (isset($_POST["btnUpload"])) {
     if ($_FILES["file"]["size"] > 0) {
         $file = fopen($filename, "r");
         $row = 1;
-        $vid = $_GET['viewid']; // Make sure to get the Patient ID
+        $vid = sanitize_input($_GET['viewid']); // Make sure to get the Patient ID
 
         while (($data = fgetcsv($file, 10000, ",")) !== FALSE) {
             if ($row == 1) { // Skip the header row
@@ -38,13 +43,13 @@ if (isset($_POST["btnUpload"])) {
             }
 
             // Retrieve and sanitize each column
-            $bp = !empty($data[0]) ? $data[0] : '';
-            $bs = !empty($data[1]) ? $data[1] : '';
-            $weight = !empty($data[2]) ? $data[2] : '';
-            $temp = !empty($data[3]) ? $data[3] : '';
-            $pres = !empty($data[4]) ? $data[4] : '';
-            $chronic = !empty($data[5]) ? $data[5] : '';
-            $prev = !empty($data[6]) ? $data[6] : '';
+            $bp = !empty($data[0]) ? sanitize_input($data[0]) : '';
+            $bs = !empty($data[1]) ? sanitize_input($data[1]) : '';
+            $weight = !empty($data[2]) ? sanitize_input($data[2]) : '';
+            $temp = !empty($data[3]) ? sanitize_input($data[3]) : '';
+            $pres = !empty($data[4]) ? sanitize_input($data[4]) : '';
+            $chronic = !empty($data[5]) ? sanitize_input($data[5]) : '';
+            $prev = !empty($data[6]) ? sanitize_input($data[6]) : '';
 
             // Ensure no empty values for important fields
             if (!empty($bp) && !empty($bs) && !empty($weight) && !empty($temp) && !empty($pres) && !empty($chronic) && !empty($prev)) {
@@ -105,7 +110,7 @@ if (isset($_POST["btnUpload"])) {
                     <section id="page-title">
                         <div class="row">
                             <div class="col-sm-8">
-                                <h1 class="mainTitle">Doctor | Medical History Upload</h1>
+                                <h1 class="mainTitle">Users | Medical History Upload</h1>
                             </div>
                             <ol class="breadcrumb">
                                 <li><span>Users</span></li>
@@ -121,7 +126,7 @@ if (isset($_POST["btnUpload"])) {
 
                                 <!-- Patient Details Table -->
                                 <?php
-                                $vid = $_GET['viewid'];
+                                $vid = sanitize_input($_GET['viewid']);
                                 $ret = mysqli_query($con, "SELECT * FROM tblpatient WHERE ID='$vid'");
                                 while ($row = mysqli_fetch_array($ret)) {
                                 ?>
@@ -216,7 +221,7 @@ if (isset($_POST["btnUpload"])) {
                                 <!-- Form for Uploading Medical History via Excel File -->
                                 <h5 class="margin-top-30">Upload <span class="text-bold">Medical Records via Excel</span></h5>
                                 <form method="POST" enctype="multipart/form-data">
-                                    <div class="form-group">
+                                    <div class="form-group"></div>
                                         <input type="file" name="file" class="form-control-file">
                                     </div>
                                     <button type="submit" name="btnUpload" class="btn btn-primary">Upload Medical Records</button>

@@ -54,7 +54,7 @@ if (isset($_POST['submit'])) {
             // Log successful login
             mysqli_query($con, "INSERT INTO userlog(uid, username, userip, status) VALUES('" . $_SESSION['id'] . "', '" . $_SESSION['login'] . "', '$uip', '$status')");
             $uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-            header("Location: http://$host$uri/$extra");
+            header("Location: https://$host$uri/$extra");
             exit();
         } else {
             // Unsuccessful login

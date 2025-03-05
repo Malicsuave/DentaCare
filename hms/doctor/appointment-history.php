@@ -5,25 +5,37 @@ include('include/config.php');
 include('include/checklogin.php');
 check_login();
 
+// Authentication and Session Management
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'doctor') {
     header("Location: error.php");
     exit();
 }
 
+// Input Validation and Data Sanitation
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
 if (isset($_GET['cancel'])) {
     $stmt = $con->prepare("UPDATE appointment SET doctorStatus='0' WHERE id=?");
-    $stmt->bind_param("i", $_GET['id']);
-    $stmt->execute();
-    $_SESSION['msg'] = "Appointment canceled !!";
-    $_SESSION['msg_type'] = "error";
+    $stmt->bind_param("i", $id);
+    if ($stmt->execute()) {
+        $_SESSION['msg'] = "Appointment canceled !!";
+        $_SESSION['msg_type'] = "error";
+    } else {
+        // Error Handling & Logging
+        error_log("Error in canceling appointment: " . $stmt->error);
+    }
 }
 
 if (isset($_GET['complete'])) {
     $stmt = $con->prepare("UPDATE appointment SET doctorStatus='2' WHERE id=?");
-    $stmt->bind_param("i", $_GET['id']);
-    $stmt->execute();
-    $_SESSION['msg'] = "Appointment marked as successful!";
-    $_SESSION['msg_type'] = "success";
+    $stmt->bind_param("i", $id);
+    if ($stmt->execute()) {
+        $_SESSION['msg'] = "Appointment marked as successful!";
+        $_SESSION['msg_type'] = "success";
+    } else {
+        // Error Handling & Logging
+        error_log("Error in completing appointment: " . $stmt->error);
+    }
 }
 ?>
 
@@ -96,11 +108,11 @@ if (isset($_GET['complete'])) {
                                     ?>
                                         <tr>
                                             <td class="center"><?php echo $cnt; ?>.</td>
-                                            <td class="hidden-xs"><?php echo $row['fname']; ?></td>
-                                            <td><?php echo $row['doctorSpecialization']; ?></td>
-                                            <td><?php echo $row['consultancyFees']; ?></td>
-                                            <td><?php echo $row['appointmentDate']; ?> / <?php echo $row['appointmentTime']; ?></td>
-                                            <td><?php echo $row['postingDate']; ?></td>
+                                            <td class="hidden-xs"><?php echo htmlspecialchars($row['fname']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['doctorSpecialization']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['consultancyFees']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['appointmentDate']); ?> / <?php echo htmlspecialchars($row['appointmentTime']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['postingDate']); ?></td>
                                             <td>
                                                 <?php 
                                                 if ($row['userStatus'] == 1 && $row['doctorStatus'] == 1) {

@@ -1,19 +1,34 @@
 <?php
 session_start();
-error_reporting(0);
 include('include/config.php');
 include('include/checklogin.php');
+
+// Input Validation and Data Sanitation
+function sanitize_input($data) {
+    return htmlspecialchars(stripslashes(trim($data)));
+}
+
+// Authentication and Session Management
 check_login();
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: error.php"); // Redirect to an error page or home page
     exit();
 }
 
-if (isset($_GET['del'])) {
-    mysqli_query($con, "DELETE FROM doctors WHERE id = '" . $_GET['id'] . "'");
-    $_SESSION['msg'] = "Doctor deleted successfully!";
+// Authorization and Access Control
+// Ensure only authorized users can access this page
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: error.php");
+    exit();
 }
 
+// Error Handling & Logging
+try {
+    if (isset($_GET['del'])) {
+        $id = sanitize_input($_GET['id']);
+        mysqli_query($con, "DELETE FROM doctors WHERE id = '$id'");
+        $_SESSION['msg'] = "Doctor deleted successfully!";
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,25 +87,26 @@ if (isset($_GET['del'])) {
                                     </thead>
                                     <tbody>
                                         <?php
-                                        $sql = mysqli_query($con, "select * from doctors");
+                                        $sql = mysqli_query($con, "SELECT * FROM doctors");
                                         $cnt = 1;
                                         while ($row = mysqli_fetch_array($sql)) {
                                         ?>
-                                               <td class="center"><?php echo $cnt; ?>.</td>
-    <td class="hidden-xs"><?php echo $row['specilization']; ?></td>
-    <td><?php echo $row['doctorName']; ?></td>
-    <td><?php echo $row['creationDate']; ?></td>
-    <td>
-        <div class="btn-group">
-            <a href="edit-doctor.php?id=<?php echo $row['id']; ?>" class="btn btn-transparent btn-xs" tooltip-placement="top" tooltip="Edit">
-                <i class="fa fa-pencil"></i> Edit
-            </a>
-            <a href="javascript:void(0);" onClick="confirmDelete(<?php echo $row['id']; ?>)" class="btn btn-transparent btn-xs tooltips" tooltip-placement="top" tooltip="Remove">
-                <i class="fa fa-times fa fa-white"></i> Remove
-            </a>
-        </div>
-    </td>
-</tr>
+                                        <tr>
+                                            <td class="center"><?php echo $cnt; ?>.</td>
+                                            <td class="hidden-xs"><?php echo sanitize_input($row['specilization']); ?></td>
+                                            <td><?php echo sanitize_input($row['doctorName']); ?></td>
+                                            <td><?php echo sanitize_input($row['creationDate']); ?></td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="edit-doctor.php?id=<?php echo sanitize_input($row['id']); ?>" class="btn btn-transparent btn-xs" tooltip-placement="top" tooltip="Edit">
+                                                        <i class="fa fa-pencil"></i> Edit
+                                                    </a>
+                                                    <a href="javascript:void(0);" onClick="confirmDelete(<?php echo sanitize_input($row['id']); ?>)" class="btn btn-transparent btn-xs tooltips" tooltip-placement="top" tooltip="Remove">
+                                                        <i class="fa fa-times fa fa-white"></i> Remove
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
                                         <?php 
                                             $cnt++;
                                         }
@@ -160,3 +176,10 @@ if (isset($_GET['del'])) {
     </script>
 </body>
 </html>
+<?php
+} catch (Exception $e) {
+    error_log($e->getMessage());
+    header("Location: error.php");
+    exit();
+}
+?>

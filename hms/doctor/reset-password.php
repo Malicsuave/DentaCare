@@ -112,7 +112,10 @@ return true;
 		<script src="vendor/jquery-cookie/jquery.cookie.js"></script>
 		<script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 		<script src="vendor/switchery/switchery.min.js"></script>
-		<script src="vendor/jquery-validation/jquery.validate.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js" 
+        integrity="sha384-lxRRZ+Wv+MDaIZe1An1CfGKnYodPph2TCI/BCkWQKlbKQzLSF/z4zyhXGp+odxI1" 
+        crossorigin="anonymous"></script>
+
 	
 		<script src="assets/js/main.js"></script>
 

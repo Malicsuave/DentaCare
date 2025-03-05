@@ -3,13 +3,40 @@ session_start();
 error_reporting(0);
 include("include/config.php");
 
+// Set security headers
+header("X-Frame-Options: DENY");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com; img-src 'self';");
+
+// Generate CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Checking Details for reset password
 if (isset($_POST['submit'])) {
-    $contactno = $_POST['contactno'];
-    $email = $_POST['email'];
-    $query = mysqli_query($con, "SELECT id FROM doctors WHERE contactno='$contactno' AND docEmail='$email'");
-    $row = mysqli_num_rows($query);
-    
+    // Verify CSRF token
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $_SESSION['error'] = 'Invalid CSRF token.';
+        header('location:forgot-password.php');
+        exit();
+    }
+
+    $contactno = htmlspecialchars(trim($_POST['contactno']));
+    $email = htmlspecialchars(trim($_POST['email']));
+
+    // Input Validation and Data Sanitation
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['error'] = 'Invalid email format.';
+        header('location:forgot-password.php');
+        exit();
+    }
+
+    $stmt = $con->prepare("SELECT id FROM doctors WHERE contactno=? AND docEmail=?");
+    $stmt->bind_param("ss", $contactno, $email);
+    $stmt->execute();
+    $stmt->store_result();
+    $row = $stmt->num_rows;
+
     if ($row > 0) {
         $_SESSION['cnumber'] = $contactno;
         $_SESSION['email'] = $email;
@@ -18,6 +45,7 @@ if (isset($_POST['submit'])) {
         // Store an error message in a session variable to trigger SweetAlert
         $_SESSION['error'] = 'Invalid details. Please try with a valid email or contact.';
     }
+    $stmt->close();
 }
 ?>
 
@@ -56,17 +84,20 @@ if (isset($_POST['submit'])) {
 
                         <div class="form-group form-actions">
                             <span class="input-icon">
-                                <input type="text" class="form-control" name="contactno" placeholder="Registered Contact Number">
+                                <input type="text" class="form-control" name="contactno" placeholder="Registered Contact Number" required>
                                 <i class="fa fa-lock"></i>
                             </span>
                         </div>
 
                         <div class="form-group">
                             <span class="input-icon">
-                                <input type="email" class="form-control" name="email" placeholder="Registered Email">
+                                <input type="email" class="form-control" name="email" placeholder="Registered Email" required>
                                 <i class="fa fa-user"></i>
                             </span>
                         </div>
+
+                        <!-- CSRF Token -->
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
 
                         <div class="form-actions">
                             <button type="submit" class="btn btn-primary pull-right" name="submit">
@@ -93,7 +124,10 @@ if (isset($_POST['submit'])) {
     <script src="vendor/jquery-cookie/jquery.cookie.js"></script>
     <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <script src="vendor/switchery/switchery.min.js"></script>
-    <script src="vendor/jquery-validation/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js" 
+        integrity="sha384-lxRRZ+Wv+MDaIZe1An1CfGKnYodPph2TCI/BCkWQKlbKQzLSF/z4zyhXGp+odxI1" 
+        crossorigin="anonymous"></script>
+
     <script src="assets/js/main.js"></script>
     <script src="assets/js/login.js"></script>
     <script>

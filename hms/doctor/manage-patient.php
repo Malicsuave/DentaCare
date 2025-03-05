@@ -79,11 +79,11 @@ while($row=mysqli_fetch_array($sql))
 ?>
 <tr>
 <td class="center"><?php echo $cnt;?>.</td>
-<td class="hidden-xs"><?php echo $row['PatientName'];?></td>
-<td><?php echo $row['PatientContno'];?></td>
-<td><?php echo $row['PatientGender'];?></td>
-<td><?php echo $row['CreationDate'];?></td>
-<td><?php echo $row['UpdationDate'];?>
+<td class="hidden-xs"><?php echo htmlspecialchars($row['PatientName']);?></td>
+<td><?php echo htmlspecialchars($row['PatientContno']);?></td>
+<td><?php echo htmlspecialchars($row['PatientGender']);?></td>
+<td><?php echo htmlspecialchars($row['CreationDate']);?></td>
+<td><?php echo htmlspecialchars($row['UpdationDate']);?>
 </td>
 <td>
 

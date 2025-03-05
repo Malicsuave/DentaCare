@@ -1,4 +1,5 @@
 <?php
+session_start();
 include_once('include/config.php');
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -10,8 +11,18 @@ ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 ini_set('error_log', '/var/log/app_errors.log');
 
+// Generate a CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 if(isset($_POST['submit']))
 {
+    // Verify the CSRF token
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        die('Invalid CSRF token');
+    }
+
     $fname = htmlspecialchars(strip_tags($_POST['full_name']));
     $address = htmlspecialchars(strip_tags($_POST['address']));
     $city = htmlspecialchars(strip_tags($_POST['city']));
@@ -84,7 +95,6 @@ if(isset($_POST['submit']))
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -136,6 +146,7 @@ if(isset($_POST['submit']))
                         <p>
                             Enter your personal details below:
                         </p>
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                         <div class="form-group">
                             <input type="text" class="form-control" name="full_name" placeholder="Full Name" required>
                         </div>

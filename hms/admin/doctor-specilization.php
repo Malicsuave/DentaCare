@@ -1,31 +1,46 @@
 <?php
 session_start();
-error_reporting(0);
 include('include/config.php');
 include('include/checklogin.php');
+
+// Input Validation and Data Sanitation
+function sanitize_input($data) {
+    return htmlspecialchars(stripslashes(trim($data)));
+}
+
+// Authentication and Session Management
 check_login();
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: error.php"); // Redirect to an error page or home page
     exit();
 }
 
-if (isset($_POST['submit'])) {
-    $specialization = trim($_POST['doctorspecilization']);
-    if (preg_match('/^[a-zA-Z0-9\s]+$/', $specialization)) { // Server-side validation
-        $sql = mysqli_query($con, "INSERT INTO doctorSpecilization(specilization) VALUES ('$specialization')");
-        $_SESSION['add_msg'] = "Doctor Specialization added successfully!";
-    } else {
-        $_SESSION['add_msg'] = "Please enter a valid specialization containing only letters, numbers, or spaces.";
-    }
-}
-
-if (isset($_GET['del']) && isset($_GET['id'])) {
-    mysqli_query($con, "DELETE FROM doctorSpecilization WHERE id = '" . $_GET['id'] . "'");
-    $_SESSION['del_msg'] = "Specialization deleted successfully!";
-    header("Location: doctor-specilization.php"); // Redirect to avoid re-triggering deletion
+// Authorization and Access Control
+// Ensure only authorized users can access this page
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: error.php");
     exit();
 }
 
+// Error Handling & Logging
+try {
+    if (isset($_POST['submit'])) {
+        $specialization = sanitize_input($_POST['doctorspecilization']);
+        if (preg_match('/^[a-zA-Z0-9\s]+$/', $specialization)) { // Server-side validation
+            $sql = mysqli_query($con, "INSERT INTO doctorSpecilization(specilization) VALUES ('$specialization')");
+            $_SESSION['add_msg'] = "Doctor Specialization added successfully!";
+        } else {
+            $_SESSION['add_msg'] = "Please enter a valid specialization containing only letters, numbers, or spaces.";
+        }
+    }
+
+    if (isset($_GET['del']) && isset($_GET['id'])) {
+        $id = sanitize_input($_GET['id']);
+        mysqli_query($con, "DELETE FROM doctorSpecilization WHERE id = '$id'");
+        $_SESSION['del_msg'] = "Specialization deleted successfully!";
+        header("Location: doctor-specilization.php"); // Redirect to avoid re-triggering deletion
+        exit();
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -111,15 +126,15 @@ if (isset($_GET['del']) && isset($_GET['id'])) {
                                                 ?>
                                                     <tr>
                                                         <td class="center"><?php echo $cnt; ?>.</td>
-                                                        <td class="hidden-xs"><?php echo $row['specilization']; ?></td>
-                                                        <td><?php echo $row['creationDate']; ?></td>
-                                                        <td><?php echo $row['updationDate']; ?></td>
+                                                        <td class="hidden-xs"><?php echo sanitize_input($row['specilization']); ?></td>
+                                                        <td><?php echo sanitize_input($row['creationDate']); ?></td>
+                                                        <td><?php echo sanitize_input($row['updationDate']); ?></td>
                                                         <td>
-   <a href="edit-doctor-specialization.php?id=<?php echo $row['id']; ?>" class="btn btn-transparent btn-xs" title="Edit">
+   <a href="edit-doctor-specialization.php?id=<?php echo sanitize_input($row['id']); ?>" class="btn btn-transparent btn-xs" title="Edit">
     <i class="fa fa-pencil"></i> Edit
 </a>
 
-<a href="javascript:void(0);" class="btn btn-transparent btn-xs" onclick="confirmDelete(<?php echo $row['id']; ?>)" title="Remove">
+<a href="javascript:void(0);" class="btn btn-transparent btn-xs" onclick="confirmDelete(<?php echo sanitize_input($row['id']); ?>)" title="Remove">
     <i class="fa fa-times fa fa-white"></i> Remove
 </a>
                                                         </td>
@@ -229,3 +244,10 @@ if (isset($_GET['del']) && isset($_GET['id'])) {
 		
 	</body>
 </html>
+<?php
+} catch (Exception $e) {
+    error_log($e->getMessage());
+    header("Location: error.php");
+    exit();
+}
+?>

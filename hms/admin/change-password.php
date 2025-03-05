@@ -5,26 +5,59 @@ include('include/config.php');
 include('include/checklogin.php');
 
 check_login();
+
+// Authentication and Session Management
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: error.php"); // Redirect to an error page or home page
     exit();
 }
+
 date_default_timezone_set('Asia/Kolkata'); // change according timezone
 $currentTime = date('d-m-Y h:i:s A', time());
 $message = ""; // Variable to hold the alert message
-if (isset($_POST['submit'])) {
-    // Check current password
-    $sql = mysqli_query($con, "SELECT password FROM admin WHERE password='" . $_POST['cpass'] . "' && username='" . $_SESSION['login'] . "'");
-    $num = mysqli_fetch_array($sql);
 
-    if ($num > 0) {
-        // Update password
-        mysqli_query($con, "UPDATE admin SET password='" . $_POST['npass'] . "', updationDate='$currentTime' WHERE username='" . $_SESSION['login'] . "'");
-        $message = "success"; // Set message type
-        $_SESSION['msg1'] = "Password updated successfully!";
+// Input validation and data sanitation
+function sanitize_input($data) {
+    return htmlspecialchars(strip_tags(trim($data)));
+}
+
+if (isset($_POST['submit'])) {
+    $cpass = sanitize_input($_POST['cpass']);
+    $npass = sanitize_input($_POST['npass']);
+    $cfpass = sanitize_input($_POST['cfpass']);
+
+    // Fetch current password from the database
+    $sql = mysqli_query($con, "SELECT password FROM admin WHERE username='" . $_SESSION['login'] . "'");
+    $num = mysqli_fetch_array($sql);
+    $db_password = $num['password']; // This could be plain text or hashed
+
+    // Check if the stored password is plain text
+    if (password_needs_rehash($db_password, PASSWORD_DEFAULT)) {
+        // If the database password is plain text, compare directly
+        if ($cpass === $db_password) {
+            // Hash the new password before storing it
+            $hashed_npass = password_hash($npass, PASSWORD_DEFAULT);
+            mysqli_query($con, "UPDATE admin SET password='$hashed_npass', updationDate='$currentTime' WHERE username='" . $_SESSION['login'] . "'");
+
+            $message = "success";
+            $_SESSION['msg1'] = "Password updated successfully!";
+        } else {
+            $message = "error";
+            $_SESSION['msg1'] = "Current password is incorrect.";
+        }
     } else {
-        $message = "error"; // Set message type
-        $_SESSION['msg1'] = "Current password is incorrect."; // Set specific error message
+        // The password is already hashed, so verify it properly
+        if (password_verify($cpass, $db_password)) {
+            // Hash the new password before storing it
+            $hashed_npass = password_hash($npass, PASSWORD_DEFAULT);
+            mysqli_query($con, "UPDATE admin SET password='$hashed_npass', updationDate='$currentTime' WHERE username='" . $_SESSION['login'] . "'");
+
+            $message = "success";
+            $_SESSION['msg1'] = "Password updated successfully!";
+        } else {
+            $message = "error";
+            $_SESSION['msg1'] = "Current password is incorrect.";
+        }
     }
 }
 

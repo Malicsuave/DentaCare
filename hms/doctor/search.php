@@ -9,6 +9,11 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'doctor') {
     exit();
 }
 
+// Input validation and data sanitation
+function sanitize_input($data) {
+    return htmlspecialchars(strip_tags(trim($data)));
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,9 +77,8 @@ Search
 <?php
 if(isset($_POST['search']))
 { 
-
-$sdata=$_POST['searchdata'];
-  ?>
+    $sdata = sanitize_input($_POST['searchdata']);
+    ?>
 <h4 align="center">Result against "<?php echo $sdata;?>" keyword </h4>
 
 <table class="table table-hover" id="sample-table-1">
@@ -91,11 +95,15 @@ $sdata=$_POST['searchdata'];
 </thead>
 <tbody>
 <?php
-$sql=mysqli_query($con,"select * from tblpatient where PatientName like '%$sdata%'|| PatientContno like '%$sdata%'");
-$num=mysqli_num_rows($sql);
-if($num>0){
-$cnt=1;
-while($row=mysqli_fetch_array($sql))
+$sql = mysqli_prepare($con, "SELECT * FROM tblpatient WHERE PatientName LIKE ? OR PatientContno LIKE ?");
+$search_param = "%{$sdata}%";
+mysqli_stmt_bind_param($sql, 'ss', $search_param, $search_param);
+mysqli_stmt_execute($sql);
+$result = mysqli_stmt_get_result($sql);
+$num = mysqli_num_rows($result);
+if($num > 0){
+$cnt = 1;
+while($row = mysqli_fetch_array($result))
 {
 ?>
 <tr>
@@ -104,25 +112,20 @@ while($row=mysqli_fetch_array($sql))
 <td><?php echo $row['PatientContno'];?></td>
 <td><?php echo $row['PatientGender'];?></td>
 <td><?php echo $row['CreationDate'];?></td>
-<td><?php echo $row['UpdationDate'];?>
-</td>
+<td><?php echo $row['UpdationDate'];?></td>
 <td>
-
 <a href="edit-patient.php?editid=<?php echo $row['ID'];?>"><i class="fa fa-edit"></i></a> || <a href="view-patient.php?viewid=<?php echo $row['ID'];?>"><i class="fa fa-eye"></i></a>
-
 </td>
 </tr>
 <?php 
-$cnt=$cnt+1;
+$cnt = $cnt + 1;
 } } else { ?>
   <tr>
     <td colspan="8"> No record found against this search</td>
-
   </tr>
-   
-<?php }} ?></tbody>
+<?php }} ?>
+</tbody>
 </table>
-</div>
 </div>
 </div>
 </div>

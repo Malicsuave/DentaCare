@@ -1,36 +1,50 @@
 <?php
 session_start();
-error_reporting(0);
 include('include/config.php');
 include('include/checklogin.php');
-check_login();
 
+// Input Validation and Data Sanitation
+function sanitize_input($data) {
+    return htmlspecialchars(stripslashes(trim($data)));
+}
+
+// Authentication and Session Management
+check_login();
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: error.php"); // Redirect to an error page or home page
     exit();
 }
-//updating Admin Remark
-if(isset($_POST['update']))
-{
-    $qid = intval($_GET['id']);
-    $adminremark = $_POST['adminremark'];
-    $isread = 1;
-    $query = mysqli_query($con, "update tblcontactus set AdminRemark='$adminremark', IsRead='$isread' where id='$qid'");
-    if($query){
-        echo "<script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Updated!',
-                text: 'Admin Remark updated successfully.',
-                confirmButtonText: 'OK'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = 'read-query.php';
-                }
-            });
-        </script>";
-    }
+
+// Authorization and Access Control
+// Ensure only authorized users can access this page
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: error.php");
+    exit();
 }
+
+// Error Handling & Logging
+try {
+    // Updating Admin Remark
+    if (isset($_POST['update'])) {
+        $qid = intval($_GET['id']);
+        $adminremark = sanitize_input($_POST['adminremark']);
+        $isread = 1;
+        $query = mysqli_query($con, "UPDATE tblcontactus SET AdminRemark='$adminremark', IsRead='$isread' WHERE id='$qid'");
+        if ($query) {
+            echo "<script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Updated!',
+                    text: 'Admin Remark updated successfully.',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'read-query.php';
+                    }
+                });
+            </script>";
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -85,19 +99,19 @@ if(isset($_POST['update']))
                                     ?>
                                     <tr>
                                         <th>Full Name</th>
-                                        <td><?php echo $row['fullname'];?></td>
+                                        <td><?php echo sanitize_input($row['fullname']);?></td>
                                     </tr>
                                     <tr>
                                         <th>Email Id</th>
-                                        <td><?php echo $row['email'];?></td>
+                                        <td><?php echo sanitize_input($row['email']);?></td>
                                     </tr>
                                     <tr>
                                         <th>Contact Number</th>
-                                        <td><?php echo $row['contactno'];?></td>
+                                        <td><?php echo sanitize_input($row['contactno']);?></td>
                                     </tr>
                                     <tr>
                                         <th>Message</th>
-                                        <td><?php echo $row['message'];?></td>
+                                        <td><?php echo sanitize_input($row['message']);?></td>
                                     </tr>
                                     <?php if($row['AdminRemark'] == ""){?>    
                                     <form name="query" method="post">
@@ -117,11 +131,11 @@ if(isset($_POST['update']))
                                     <?php } else {?>                                            
                                     <tr>
                                         <th>Admin Remark</th>
-                                        <td><?php echo $row['AdminRemark'];?></td>
+                                        <td><?php echo sanitize_input($row['AdminRemark']);?></td>
                                     </tr>
                                     <tr>
                                         <th>Last Updatation Date</th>
-                                        <td><?php echo $row['LastupdationDate'];?></td>
+                                        <td><?php echo sanitize_input($row['LastupdationDate']);?></td>
                                     </tr>
                                     <?php }} ?>
                                 </tbody>
@@ -173,4 +187,10 @@ if(isset($_POST['update']))
     </script>
 </body>
 </html>
-s
+<?php
+} catch (Exception $e) {
+    error_log($e->getMessage());
+    header("Location: error.php");
+    exit();
+}
+?>

@@ -1,34 +1,40 @@
 <?php
-session_start();
+session_start([
+    'cookie_lifetime' => 86400,
+    'cookie_secure' => true,
+    'cookie_httponly' => true,
+    'cookie_samesite' => 'Strict',
+]);
 
 include('include/config.php');
 include('include/checklogin.php');
+
 check_login();
 
 require '../PHPMailer/vendor/autoload.php';
 
-// Debugging: Display session role
-
-
 // Ensure the user has admin role
-    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-        header("Location: error.php"); // Redirect to an error page or home page
-        exit();
-    }
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: error.php"); // Redirect to an error page or home page
+    exit();
+}
 
 // Include PHPMailer classes
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-if(isset($_POST['submit'])) {
-    echo "Form submitted successfully. Processing...<br>"; // Debugging line
+// Input validation and data sanitation
+function sanitize_input($data) {
+    return htmlspecialchars(strip_tags(trim($data)));
+}
 
-    $docspecialization = $_POST['Doctorspecialization'];
-    $docname = $_POST['docname'];
-    $docaddress = $_POST['clinicaddress'];
-    $docfees = $_POST['docfees'];
-    $doccontactno = $_POST['doccontact'];
-    $docemail = $_POST['docemail'];
+if(isset($_POST['submit'])) {
+    $docspecialization = sanitize_input($_POST['Doctorspecialization']);
+    $docname = sanitize_input($_POST['docname']);
+    $docaddress = encryptData(sanitize_input($_POST['clinicaddress'])); // Encrypt address
+    $docfees = sanitize_input($_POST['docfees']);
+    $doccontactno = sanitize_input($_POST['doccontact']);
+    $docemail = sanitize_input($_POST['docemail']);
 
     // Generate a random password
     function random_password($length = 8) {
@@ -36,17 +42,15 @@ if(isset($_POST['submit'])) {
         return substr(str_shuffle($str), 0, $length);
     }
     $password = random_password(8);
-    $hashed_password = md5($password); // Hash the password for storage
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT); // Hash the password for storage
 
     // Insert doctor info into the database
     $sql = mysqli_query($con, "INSERT INTO doctors(specilization, doctorName, address, docFees, contactno, docEmail, password) VALUES('$docspecialization', '$docname', '$docaddress', '$docfees', '$doccontactno', '$docemail', '$hashed_password')");
     
     // Check if the query was successful
     if (!$sql) {
-        echo "Database error: " . mysqli_error($con); // Debugging line
-        exit();
+        $errorMessage = "Database error: " . mysqli_error($con);
     } else {
-        echo "Doctor added successfully.<br>"; // Debugging line
         $mail = new PHPMailer(true);
         try {
             $mail->isSMTP();
@@ -67,7 +71,7 @@ if(isset($_POST['submit'])) {
             $mail->send();
             $success = true; // Set success flag to true
         } catch (Exception $e) {
-            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            $errorMessage = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         }
     }
 }
@@ -176,6 +180,14 @@ if(isset($_POST['submit'])) {
                         text: 'Doctor info added successfully and email sent!',
                     }).then(() => {
                         window.location.href = 'manage-doctors.php';
+                    });
+                </script>
+            <?php elseif (isset($errorMessage)): ?>
+                <script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: "<?php echo $errorMessage; ?>",
                     });
                 </script>
             <?php endif; ?>
